@@ -9,8 +9,7 @@ public class SupermarketWithUI extends GUIState {
 	public Display2D display;
 	public JFrame displayFrame;
 
-	FastValueGridPortrayal2D customer = new FastValueGridPortrayal2D("Customer");
-	FastValueGridPortrayal2D checkstand = new FastValueGridPortrayal2D("Checkstand");
+	FastValueGridPortrayal2D checkstand = new FastValueGridPortrayal2D("Supermarket");
 	FastValueGridPortrayal2D sitesPortrayal = new FastValueGridPortrayal2D("Site", true);  // immutable
 	SparseGridPortrayal2D supermarketPortrayal = new SparseGridPortrayal2D();
 
@@ -87,8 +86,9 @@ public class SupermarketWithUI extends GUIState {
 		displayFrame.setVisible(true);
 
 		// attach the portrayals from bottom to top
-		display.attach(customer, "Customer");
 		display.attach(checkstand, "Checkstand");
+		display.attach(sitesPortrayal, "Site Locations");
+		display.attach(supermarketPortrayal, "Agents");
 
 		// specify the backdrop color  -- what gets painted behind the displays
 		display.setBackdrop(Color.gray);

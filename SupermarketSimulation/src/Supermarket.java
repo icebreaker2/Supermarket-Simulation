@@ -1,30 +1,24 @@
 import sim.engine.*;
 import sim.field.grid.*;
-import sim.util.*;
-
 
 public class Supermarket extends SimState {
 	private static final long serialVersionUID = 1;
 
-	public static final int GRID_HEIGHT = 100;
-	public static final int GRID_WIDTH = 100;
+	public static final int GRID_HEIGHT = 101;
+	public static final int GRID_WIDTH = 101;
 
 	// set locations for checkstand or spawn point of the customers
-	public static final int Customer_XMIN = 75;
-	public static final int Customer_XMAX = 75;
-	public static final int Customer_YMIN = 75;
-	public static final int Customer_YMAX = 75;
+	public static final int CUSTOMER_X = 100;
+	public static final int CUSTOMER_Y = 75;
 
-	public static final int Checkstand_XMIN = 25;
-	public static final int Checkstand_XMAX = 25;
-	public static final int Checkstand_YMIN = 25;
-	public static final int Checkstand_YMAX = 25;
+	public static final int CHECKSTAND_X = 25;
+	public static final int CHECKSTAND_Y = 75;
 
 	public static final int CUSTOMER = 1;
 	public static final int CHECKSTAND = 2;
 
 	// some properties
-	public int numCustomers = 1000;
+	public int numCustomers = 100;
 	public int checkstandCustomersAmount_variance = 4;
 
 	public int getCheckstandCustomersAmount_variance() {
@@ -69,18 +63,14 @@ public class Supermarket extends SimState {
 		toCheckstandGrid = new DoubleGrid2D(GRID_WIDTH, GRID_HEIGHT, 0);
 		supermarketgrid = new SparseGrid2D(GRID_WIDTH, GRID_HEIGHT);
 
-		// initialize the grid with the spawn point of the customers and the checkstand sites
-		for (int x = Customer_XMIN; x <= Customer_XMAX; x++)
-			for (int y = Customer_YMIN; y <= Customer_YMAX; y++)
-				sites.field[x][y] = CUSTOMER;
-		for (int x = Checkstand_XMIN; x <= Checkstand_XMAX; x++)
-			for (int y = Checkstand_YMIN; y <= Checkstand_YMAX; y++)
-				sites.field[x][y] = CHECKSTAND;
+		sites.field[CUSTOMER_X][CUSTOMER_Y] = CUSTOMER;
+		sites.field[CHECKSTAND_X][CHECKSTAND_Y] = CHECKSTAND;
 
 		for (int x = 0; x < numCustomers; x++) {
 			Customer customer = new Customer();
-			supermarketgrid.setObjectLocation(customer, (Customer_XMAX + Customer_XMIN) / 2, (Customer_YMAX + Customer_YMIN) / 2);
-			schedule.scheduleRepeating(Schedule.EPOCH + x, 0, customer, 1);
+			supermarketgrid.setObjectLocation(customer, CUSTOMER_X, CUSTOMER_Y);
+			schedule.scheduleRepeating(Schedule.EPOCH + x, 0, customer, 1 /* Perform a an act at each 'interval' steps */);
+			//delayMovement(customer);
 		}
 
 		// Schedule evaporation to happen after the customers move and update
@@ -90,6 +80,17 @@ public class Supermarket extends SimState {
 			}
 		}, 1);
 
+	}
+
+	private void delayMovement(Customer customer) {
+		try {
+			customer.wait(500 + (int) (Math.random()*1000));
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			// TODO handle error in a moderate way
+		}
+
+		// TODO this spawn has to be delayed by a normal deviation
 	}
 
 	public static void main(String[] args) {

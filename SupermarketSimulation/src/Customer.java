@@ -8,42 +8,45 @@ import java.awt.*;
 public class Customer extends OvalPortrayal2D implements Steppable {
 	private static final long serialVersionUID = 1;
 
-	public boolean getHasFoodItem() {
-		return hasFoodItem;
-	}
-
-	public void setHasFoodItem(boolean val) {
-		hasFoodItem = val;
-	}
-
-	public boolean hasFoodItem = false;
-	double reward = 1;
-
-	int x;
-	int y;
+	private boolean isInQueue = false;
+	private int processingDelay = -1;
+	private final int canLeaveCheckstand = 0;
 
 	Int2D last;
 
 	public Customer() {
 	}
 
-	public void act(final SimState state) {
+	public void step(final SimState state) {
 		final Supermarket supermarket = (Supermarket) state;
 
 		Int2D location = supermarket.supermarketgrid.getObjectLocation(this);
 		int x = location.x;
 		int y = location.y;
 
-		// TODO if there is a customer at the left side (next customer in the queue) then wait and visualize the waiting
-		// TODO Maybe the grid and visualization is not needed at all.
+		if (x == supermarket.CHECKSTAND_X && y == supermarket.CHECKSTAND_Y && processingDelay != canLeaveCheckstand) { // wait at the checkstand
+			if (!isInQueue) {
+				// TODO implement the queue and compute the processing delay at the checkstand. I suggest the following:
+			/*
+				1. Compute a normal deviated delay in steps
+				2. set processingDelay to the computed delay and add the delays of the customers in that are top of this customer (see the queue of the customers in front)
+				3. decrease processingDelay each step
+				4. If processingDelay is 0 again the customer leaves to the left as he would before
+				See the delay of random steps hardcoded
+			 */
+				processingDelay = 500 + (int) (Math.random()*1000); // delaying steps
+				isInQueue = !isInQueue;
+			} else {
+				processingDelay--;
+			}
 
-		// now go straight left
-		supermarket.supermarketgrid.setObjectLocation(this, new Int2D(x-1, y-1));
+		} else {
+			// now go straight left to the checkstand
+			supermarket.supermarketgrid.setObjectLocation(this, new Int2D(x - 1, y)); // run straight to the checkstand
+		}
+
+
 		last = location;
-	}
-
-	public void step(final SimState state) {
-		act(state);
 	}
 
 	public final void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
