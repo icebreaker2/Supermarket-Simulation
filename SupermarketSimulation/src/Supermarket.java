@@ -1,12 +1,9 @@
 import sim.engine.*;
 import sim.field.grid.*;
 
+import java.util.ArrayList;
+
 public class Supermarket extends SimState {
-	private static final long serialVersionUID = 1;
-
-	public static final int GRID_HEIGHT = 101;
-	public static final int GRID_WIDTH = 101;
-
 	// set locations for checkstand or spawn point of the customers
 	public static final int CUSTOMER_X = 100;
 	public static final int CUSTOMER_Y = 75;
@@ -21,35 +18,16 @@ public class Supermarket extends SimState {
 	public int numCustomers = 100;
 	public int checkstandCustomersAmount_variance = 4;
 
-	public int getCheckstandCustomersAmount_variance() {
-		return checkstandCustomersAmount_variance;
-	}
-
-	public void setCheckstandCustomersAmount_variance(int checkstandCustomersAmount_variance) {
-		this.checkstandCustomersAmount_variance = checkstandCustomersAmount_variance;
-	}
-
-	public int getCheckstandProcessingTime_variance() {
-		return checkstandProcessingTime_variance;
-	}
-
-	public void setCheckstandProcessingTime_variance(int checkstandProcessingTime_variance) {
-		this.checkstandProcessingTime_variance = checkstandProcessingTime_variance;
-	}
-
-	public int checkstandProcessingTime_variance = 5;
-
-	public int getNumCustomers() {
-		return numCustomers;
-	}
-
-	public void setNumCustomers(int val) {
-		if (val > 0) numCustomers = val;
-	}
-
 	public IntGrid2D sites;
 	public DoubleGrid2D toCheckstandGrid;
 	public SparseGrid2D supermarketgrid;
+
+	private static final long serialVersionUID = 1;
+
+	private static final int GRID_HEIGHT = 101;
+	private static final int GRID_WIDTH = 101;
+
+	private static ArrayList<Customer> checkstandQueue = new ArrayList<>();
 
 	public Supermarket(long seed) {
 		super(seed);
@@ -83,13 +61,51 @@ public class Supermarket extends SimState {
 	}
 
 	private int delayMovement() {
-		return 500 + (int) (Math.random() * 1000);
+		return (int) (Math.random() * 1000);
 		// TODO this spawn has to be delayed by a normal deviation
 	}
 
-	public static void main(String[] args) {
-		doLoop(Supermarket.class, args);
-		System.exit(0);
+	public static synchronized void addCustomerToCheckstandQueue (Customer customer) {
+		checkstandQueue.add(customer);
+	}
+
+	public static synchronized void removeFirstCustomerFromCheckstandQueue () {
+		checkstandQueue.remove(0); // TODO we may want to check whether we deleted the correct object
+	}
+
+	public static synchronized long computeDelayFromTheTop() {
+		long totalDelay = 0;
+		for(Customer customer : checkstandQueue) {
+			totalDelay += customer.getProcessingDelay();
+		}
+		return totalDelay;
+	}
+
+	// getter and setter for the model
+	public int getCheckstandCustomersAmount_variance() {
+		return checkstandCustomersAmount_variance;
+	}
+
+	public void setCheckstandCustomersAmount_variance(int checkstandCustomersAmount_variance) {
+		this.checkstandCustomersAmount_variance = checkstandCustomersAmount_variance;
+	}
+
+	public int getCheckstandProcessingTime_variance() {
+		return checkstandProcessingTime_variance;
+	}
+
+	public void setCheckstandProcessingTime_variance(int checkstandProcessingTime_variance) {
+		this.checkstandProcessingTime_variance = checkstandProcessingTime_variance;
+	}
+
+	public int checkstandProcessingTime_variance = 5;
+
+	public int getNumCustomers() {
+		return numCustomers;
+	}
+
+	public void setNumCustomers(int val) {
+		if (val > 0) numCustomers = val;
 	}
 }
 

@@ -9,7 +9,9 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 	private static final long serialVersionUID = 1;
 
 	private boolean isInQueue = false;
-	private int processingDelay = -1;
+
+	private long processingDelay = -1;
+	private long ownTotalWaitingTime = -1;
 	private final int canLeaveCheckstand = 0;
 
 	Int2D last;
@@ -34,8 +36,11 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 				4. If processingDelay is 0 again the customer leaves to the left as he would before
 				See the delay of random steps hardcoded
 			 */
-				processingDelay = 500 + (int) (Math.random()*1000); // delaying steps
-
+				// compute the delay in addition to the own wating time
+				processingDelay = (long) (Math.random()*500); // delaying steps for the processing time at the checkstand
+				ownTotalWaitingTime = processingDelay + Supermarket.computeDelayFromTheTop(); // take the other processing times of customer ahead into account
+				// add yourself to the list of waiting customers
+				Supermarket.addCustomerToCheckstandQueue(this);
 				isInQueue = !isInQueue;
 			} else {
 				processingDelay--;
@@ -60,5 +65,9 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 		int height = (int) (info.draw.height);
 		graphics.fillOval(x, y, width, height);
 
+	}
+
+	public long getProcessingDelay() {
+		return processingDelay;
 	}
 }
