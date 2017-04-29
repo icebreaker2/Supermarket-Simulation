@@ -9,69 +9,53 @@ public class Supermarket extends SimState {
 	public static final int GRID_HEIGHT = 100;
 	public static final int GRID_WIDTH = 100;
 
-	public static final int HOME_XMIN = 75;
-	public static final int HOME_XMAX = 75;
-	public static final int HOME_YMIN = 75;
-	public static final int HOME_YMAX = 75;
+	// set locations for checkstand or spawn point of the customers
+	public static final int Customer_XMIN = 75;
+	public static final int Customer_XMAX = 75;
+	public static final int Customer_YMIN = 75;
+	public static final int Customer_YMAX = 75;
 
-	public static final int FOOD_XMIN = 25;
-	public static final int FOOD_XMAX = 25;
-	public static final int FOOD_YMIN = 25;
-	public static final int FOOD_YMAX = 25;
+	public static final int Checkstand_XMIN = 25;
+	public static final int Checkstand_XMAX = 25;
+	public static final int Checkstand_YMIN = 25;
+	public static final int Checkstand_YMAX = 25;
 
-	public static final int NO_OBSTACLES = 0;
-	public static final int ONE_OBSTACLE = 1;
-	public static final int TWO_OBSTACLES = 2;
-	public static final int ONE_LONG_OBSTACLE = 3;
-
-	public static final int OBSTACLES = TWO_OBSTACLES;
-
-	public static final int ALGORITHM_VALUE_ITERATION = 1;
-	public static final int ALGORITHM_TEMPORAL_DIFERENCE = 2;
-	public static final int ALGORITHM = ALGORITHM_VALUE_ITERATION;
-
-	public static final double IMPOSSIBLY_BAD_PHEROMONE = -1;
-	public static final double LIKELY_MAX_PHEROMONE = 3;
-
-	public static final int HOME = 1;
-	public static final int FOOD = 2;
-
-
-	public int numCustomers = 1000;
-	public double randomActionProbability = 0.1;
-
+	public static final int CUSTOMER = 1;
+	public static final int CHECKSTAND = 2;
 
 	// some properties
-	public int getNumAnts() {
+	public int numCustomers = 1000;
+	public int checkstandCustomersAmount_variance = 4;
+
+	public int getCheckstandCustomersAmount_variance() {
+		return checkstandCustomersAmount_variance;
+	}
+
+	public void setCheckstandCustomersAmount_variance(int checkstandCustomersAmount_variance) {
+		this.checkstandCustomersAmount_variance = checkstandCustomersAmount_variance;
+	}
+
+	public int getCheckstandProcessingTime_variance() {
+		return checkstandProcessingTime_variance;
+	}
+
+	public void setCheckstandProcessingTime_variance(int checkstandProcessingTime_variance) {
+		this.checkstandProcessingTime_variance = checkstandProcessingTime_variance;
+	}
+
+	public int checkstandProcessingTime_variance = 5;
+
+	public int getNumCustomers() {
 		return numCustomers;
 	}
 
-	public void setnumCustomers(int val) {
+	public void setNumCustomers(int val) {
 		if (val > 0) numCustomers = val;
 	}
 
-	public Object domMomentumProbability() {
-		return new Interval(0.0, 1.0);
-	}
-
-	public double getRandomActionProbability() {
-		return randomActionProbability;
-	}
-
-	public void setRandomActionProbability(double val) {
-		if (val >= 0 && val <= 1.0) randomActionProbability = val;
-	}
-
-	public Object domRandomActionProbability() {
-		return new Interval(0.0, 1.0);
-	}
-
-
-	public IntGrid2D sites = new IntGrid2D(GRID_WIDTH, GRID_HEIGHT, 0);
-	public DoubleGrid2D toFoodGrid = new DoubleGrid2D(GRID_WIDTH, GRID_HEIGHT, 0);
-	public DoubleGrid2D toHomeGrid = new DoubleGrid2D(GRID_WIDTH, GRID_HEIGHT, 0);
-	public SparseGrid2D buggrid = new SparseGrid2D(GRID_WIDTH, GRID_HEIGHT);
-	public IntGrid2D obstacles = new IntGrid2D(GRID_WIDTH, GRID_HEIGHT, 0);
+	public IntGrid2D sites;
+	public DoubleGrid2D toCheckstandGrid;
+	public SparseGrid2D supermarketgrid;
 
 	public Supermarket(long seed) {
 		super(seed);
@@ -82,66 +66,27 @@ public class Supermarket extends SimState {
 
 		// make new grids
 		sites = new IntGrid2D(GRID_WIDTH, GRID_HEIGHT, 0);
-		toFoodGrid = new DoubleGrid2D(GRID_WIDTH, GRID_HEIGHT, 0);
-		toHomeGrid = new DoubleGrid2D(GRID_WIDTH, GRID_HEIGHT, 0);
-		//valgrid2 = new DoubleGrid2D(GRID_WIDTH, GRID_HEIGHT, 0);
-		buggrid = new SparseGrid2D(GRID_WIDTH, GRID_HEIGHT);
-		obstacles = new IntGrid2D(GRID_WIDTH, GRID_HEIGHT, 0);
+		toCheckstandGrid = new DoubleGrid2D(GRID_WIDTH, GRID_HEIGHT, 0);
+		supermarketgrid = new SparseGrid2D(GRID_WIDTH, GRID_HEIGHT);
 
-		switch (OBSTACLES) {
-			case NO_OBSTACLES:
-				break;
-			case ONE_OBSTACLE:
-				for (int x = 0; x < GRID_WIDTH; x++)
-					for (int y = 0; y < GRID_HEIGHT; y++) {
-						obstacles.field[x][y] = 0;
-						if (((x - 55) * 0.707 + (y - 35) * 0.707) * ((x - 55) * 0.707 + (y - 35) * 0.707) / 36 +
-								((x - 55) * 0.707 - (y - 35) * 0.707) * ((x - 55) * 0.707 - (y - 35) * 0.707) / 1024 <= 1)
-							obstacles.field[x][y] = 1;
-					}
-				break;
-			case TWO_OBSTACLES:
-				for (int x = 0; x < GRID_WIDTH; x++)
-					for (int y = 0; y < GRID_HEIGHT; y++) {
-						obstacles.field[x][y] = 0;
-						if (((x - 45) * 0.707 + (y - 25) * 0.707) * ((x - 45) * 0.707 + (y - 25) * 0.707) / 36 +
-								((x - 45) * 0.707 - (y - 25) * 0.707) * ((x - 45) * 0.707 - (y - 25) * 0.707) / 1024 <= 1)
-							obstacles.field[x][y] = 1;
-						if (((x - 35) * 0.707 + (y - 70) * 0.707) * ((x - 35) * 0.707 + (y - 70) * 0.707) / 36 +
-								((x - 35) * 0.707 - (y - 70) * 0.707) * ((x - 35) * 0.707 - (y - 70) * 0.707) / 1024 <= 1)
-							obstacles.field[x][y] = 1;
-					}
-				break;
-			case ONE_LONG_OBSTACLE:
-				for (int x = 0; x < GRID_WIDTH; x++)
-					for (int y = 0; y < GRID_HEIGHT; y++) {
-						obstacles.field[x][y] = 0;
-						if ((x - 60) * (x - 60) / 1600 +
-								(y - 50) * (y - 50) / 25 <= 1)
-							obstacles.field[x][y] = 1;
-					}
-				break;
-		}
-
-		// initialize the grid with the home and food sites
-		for (int x = HOME_XMIN; x <= HOME_XMAX; x++)
-			for (int y = HOME_YMIN; y <= HOME_YMAX; y++)
-				sites.field[x][y] = HOME;
-		for (int x = FOOD_XMIN; x <= FOOD_XMAX; x++)
-			for (int y = FOOD_YMIN; y <= FOOD_YMAX; y++)
-				sites.field[x][y] = FOOD;
+		// initialize the grid with the spawn point of the customers and the checkstand sites
+		for (int x = Customer_XMIN; x <= Customer_XMAX; x++)
+			for (int y = Customer_YMIN; y <= Customer_YMAX; y++)
+				sites.field[x][y] = CUSTOMER;
+		for (int x = Checkstand_XMIN; x <= Checkstand_XMAX; x++)
+			for (int y = Checkstand_YMIN; y <= Checkstand_YMAX; y++)
+				sites.field[x][y] = CHECKSTAND;
 
 		for (int x = 0; x < numCustomers; x++) {
 			Customer customer = new Customer();
-			buggrid.setObjectLocation(customer, (HOME_XMAX + HOME_XMIN) / 2, (HOME_YMAX + HOME_YMIN) / 2);
+			supermarketgrid.setObjectLocation(customer, (Customer_XMAX + Customer_XMIN) / 2, (Customer_YMAX + Customer_YMIN) / 2);
 			schedule.scheduleRepeating(Schedule.EPOCH + x, 0, customer, 1);
 		}
 
-		// Schedule evaporation to happen after the ants move and update
+		// Schedule evaporation to happen after the customers move and update
 		schedule.scheduleRepeating(Schedule.EPOCH, 1, new Steppable() {
 			public void step(SimState state) {
-				toFoodGrid.multiply(1);
-				toHomeGrid.multiply(1);
+				toCheckstandGrid.multiply(1);
 			}
 		}, 1);
 

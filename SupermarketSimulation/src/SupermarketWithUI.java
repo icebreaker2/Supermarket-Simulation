@@ -11,6 +11,8 @@ public class SupermarketWithUI extends GUIState {
 
 	FastValueGridPortrayal2D customer = new FastValueGridPortrayal2D("Customer");
 	FastValueGridPortrayal2D checkstand = new FastValueGridPortrayal2D("Checkstand");
+	FastValueGridPortrayal2D sitesPortrayal = new FastValueGridPortrayal2D("Site", true);  // immutable
+	SparseGridPortrayal2D supermarketPortrayal = new SparseGridPortrayal2D();
 
 	public static void main(String[] args) {
 		new SupermarketWithUI().createController();
@@ -38,28 +40,24 @@ public class SupermarketWithUI extends GUIState {
 		Supermarket supermarket = (Supermarket) state;
 
 		// tell the portrayals what to portray and how to portray them
-		customer.setField(supermarket.toHomeGrid);
-		customer.setMap(new sim.util.gui.SimpleColorMap(
-				0,
-				Supermarket.LIKELY_MAX_PHEROMONE,
+		checkstand.setField(supermarket.toCheckstandGrid);
+		checkstand.setMap(new sim.util.gui.SimpleColorMap(
+				0, 3,
 				// home pheromones are beneath all, just make them opaque
 				Color.white, //new Color(0,255,0,0),
 				new Color(0, 255, 0, 255)) {
 			public double filterLevel(double level) {
 				return Math.sqrt(Math.sqrt(level));
 			}
-		});  // map with custom level filtering
-		checkstand.setField(supermarket.toFoodGrid);
-		checkstand.setMap(new sim.util.gui.SimpleColorMap(
-				0,
-				Supermarket.LIKELY_MAX_PHEROMONE,
-				new Color(0, 0, 255, 0),
-				new Color(0, 0, 255, 255)) {
-			public double filterLevel(double level) {
-				return Math.sqrt(Math.sqrt(level));
-			}
 		});
-
+		// map with custom level filtering
+		sitesPortrayal.setField(supermarket.sites);
+		sitesPortrayal.setMap(new sim.util.gui.SimpleColorMap(
+				0,
+				1,
+				new Color(0, 0, 0, 0),
+				new Color(255, 0, 0, 255)));
+		supermarketPortrayal.setField(supermarket.supermarketgrid);
 		// reschedule the displayer
 		display.reset();
 
@@ -93,7 +91,7 @@ public class SupermarketWithUI extends GUIState {
 		display.attach(checkstand, "Checkstand");
 
 		// specify the backdrop color  -- what gets painted behind the displays
-		display.setBackdrop(Color.white);
+		display.setBackdrop(Color.gray);
 	}
 
 	public void quit() {
