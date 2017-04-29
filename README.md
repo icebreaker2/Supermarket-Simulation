@@ -1,5 +1,5 @@
 # Mason Supermarket Simulation
-This project contains an [experiments](experiments/README.md) folder with basic implementations of *MASON* within a java project. In addition, there is a [Supermarket Simulation](supermarketSimulation/README.md) for consumers waiting at a checkstand. 
+This project contains an [experiments](experiments/README.md) folder with basic implementations of *MASON* within a java project. In addition, there is a [Supermarket Simulation](SupermarketSimulation/README.md) for consumers waiting at a checkstand. 
 
 ## Prerequisites
 For both sub projects there are prerequisites to met:
@@ -9,7 +9,7 @@ For both sub projects there are prerequisites to met:
 3. Download [Mason](http://cs.gmu.edu/~eclab/projects/mason/) and follow the instructions given at this page.
 
 ### To develop an own simulation application
-To develop with *MASON* you have to satisfy the prerequistes of the previous paragraph and just follow the instructions of our (libs)[libs/README.md] folder. If you want to install the required additional libraries yourself you find this steps usefull (in brackets are the linux packages):
+To develop with *MASON* you have to satisfy the prerequistes of the previous paragraph and just follow the instructions of our [libs](libs/README.md) folder. If you want to install the required additional libraries yourself you find this steps usefull (in brackets are the linux packages):
 1. Install *JFreeChart* (libjfreechart-java).
 2. Install *JCommon* (java-common).
 3. Install *iText* (libitext-java).

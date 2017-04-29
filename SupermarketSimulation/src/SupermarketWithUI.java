@@ -1,11 +1,3 @@
-/*
-  Copyright 2009 by Sean Luke and George Mason University
-  Licensed under the Academic Free License version 3.0
-  See the file "LICENSE" for more information
-*/
-
-package ex;
-
 import sim.engine.*;
 import sim.display.*;
 import sim.portrayal.grid.*;
@@ -13,25 +5,23 @@ import sim.portrayal.grid.*;
 import java.awt.*;
 import javax.swing.*;
 
-public class AntsForageWithUI extends GUIState {
+public class SupermarketWithUI extends GUIState {
 	public Display2D display;
 	public JFrame displayFrame;
 
-	FastValueGridPortrayal2D homePheromonePortrayal = new FastValueGridPortrayal2D("Home Pheromone");
-	FastValueGridPortrayal2D foodPheromonePortrayal = new FastValueGridPortrayal2D("Food Pheromone");
+	FastValueGridPortrayal2D checkstand = new FastValueGridPortrayal2D("Supermarket");
 	FastValueGridPortrayal2D sitesPortrayal = new FastValueGridPortrayal2D("Site", true);  // immutable
-	FastValueGridPortrayal2D obstaclesPortrayal = new FastValueGridPortrayal2D("Obstacle", true);  // immutable
-	SparseGridPortrayal2D bugPortrayal = new SparseGridPortrayal2D();
+	SparseGridPortrayal2D supermarketPortrayal = new SparseGridPortrayal2D();
 
 	public static void main(String[] args) {
-		new AntsForageWithUI().createController();
+		new SupermarketWithUI().createController();
 	}
 
-	public AntsForageWithUI() {
-		super(new AntsForage(System.currentTimeMillis()));
+	public SupermarketWithUI() {
+		super(new Supermarket(System.currentTimeMillis()));
 	}
 
-	public AntsForageWithUI(SimState state) {
+	public SupermarketWithUI(SimState state) {
 		super(state);
 	}
 
@@ -41,48 +31,32 @@ public class AntsForageWithUI extends GUIState {
 	}  // non-volatile
 
 	public static String getName() {
-		return "Ant Foraging";
+		return "Supermarket Simulation";
 	}
 
 	public void setupPortrayals() {
-		AntsForage af = (AntsForage) state;
+
+		Supermarket supermarket = (Supermarket) state;
 
 		// tell the portrayals what to portray and how to portray them
-		homePheromonePortrayal.setField(af.toHomeGrid);
-		homePheromonePortrayal.setMap(new sim.util.gui.SimpleColorMap(
-				0,
-				AntsForage.LIKELY_MAX_PHEROMONE,
+		checkstand.setField(supermarket.toCheckstandGrid);
+		checkstand.setMap(new sim.util.gui.SimpleColorMap(
+				0, 3,
 				// home pheromones are beneath all, just make them opaque
 				Color.white, //new Color(0,255,0,0),
 				new Color(0, 255, 0, 255)) {
 			public double filterLevel(double level) {
 				return Math.sqrt(Math.sqrt(level));
 			}
-		});  // map with custom level filtering
-		foodPheromonePortrayal.setField(af.toFoodGrid);
-		foodPheromonePortrayal.setMap(new sim.util.gui.SimpleColorMap(
-				0,
-				AntsForage.LIKELY_MAX_PHEROMONE,
-				new Color(0, 0, 255, 0),
-				new Color(0, 0, 255, 255)) {
-			public double filterLevel(double level) {
-				return Math.sqrt(Math.sqrt(level));
-			}
-		});  // map with custom level filtering
-		sitesPortrayal.setField(af.sites);
+		});
+		// map with custom level filtering
+		sitesPortrayal.setField(supermarket.sites);
 		sitesPortrayal.setMap(new sim.util.gui.SimpleColorMap(
 				0,
 				1,
 				new Color(0, 0, 0, 0),
 				new Color(255, 0, 0, 255)));
-		obstaclesPortrayal.setField(af.obstacles);
-		obstaclesPortrayal.setMap(new sim.util.gui.SimpleColorMap(
-				0,
-				1,
-				new Color(0, 0, 0, 0),
-				new Color(128, 64, 64, 255)));
-		bugPortrayal.setField(af.buggrid);
-
+		supermarketPortrayal.setField(supermarket.supermarketgrid);
 		// reschedule the displayer
 		display.reset();
 
@@ -112,14 +86,12 @@ public class AntsForageWithUI extends GUIState {
 		displayFrame.setVisible(true);
 
 		// attach the portrayals from bottom to top
-		display.attach(homePheromonePortrayal, "Pheromones To Home");
-		display.attach(foodPheromonePortrayal, "Pheromones To Food");
+		display.attach(checkstand, "Checkstand");
 		display.attach(sitesPortrayal, "Site Locations");
-		display.attach(obstaclesPortrayal, "Obstacles");
-		display.attach(bugPortrayal, "Agents");
+		display.attach(supermarketPortrayal, "Agents");
 
 		// specify the backdrop color  -- what gets painted behind the displays
-		display.setBackdrop(Color.white);
+		display.setBackdrop(Color.gray);
 	}
 
 	public void quit() {
@@ -133,7 +105,7 @@ public class AntsForageWithUI extends GUIState {
 	}
 
 }
-    
-    
-    
-    
+
+
+
+
