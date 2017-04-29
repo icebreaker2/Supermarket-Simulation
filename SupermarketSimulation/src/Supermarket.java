@@ -69,8 +69,8 @@ public class Supermarket extends SimState {
 		for (int x = 0; x < numCustomers; x++) {
 			Customer customer = new Customer();
 			supermarketgrid.setObjectLocation(customer, CUSTOMER_X, CUSTOMER_Y);
-			schedule.scheduleRepeating(Schedule.EPOCH + x, 0, customer, 1 /* Perform a an act at each 'interval' steps */);
-			//delayMovement(customer);
+			int delay = delayMovement();
+			schedule.scheduleRepeating(Schedule.EPOCH + delay /* The customer spawns at the given time*/, 0, customer, 1 /* Perform a an act at each 'interval' steps */);
 		}
 
 		// Schedule evaporation to happen after the customers move and update
@@ -82,14 +82,8 @@ public class Supermarket extends SimState {
 
 	}
 
-	private void delayMovement(Customer customer) {
-		try {
-			customer.wait(500 + (int) (Math.random()*1000));
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			// TODO handle error in a moderate way
-		}
-
+	private int delayMovement() {
+		return 500 + (int) (Math.random() * 1000);
 		// TODO this spawn has to be delayed by a normal deviation
 	}
 

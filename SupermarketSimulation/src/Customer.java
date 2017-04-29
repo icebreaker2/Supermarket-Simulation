@@ -35,6 +35,7 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 				See the delay of random steps hardcoded
 			 */
 				processingDelay = 500 + (int) (Math.random()*1000); // delaying steps
+
 				isInQueue = !isInQueue;
 			} else {
 				processingDelay--;
