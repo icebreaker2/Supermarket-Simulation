@@ -1,17 +1,9 @@
-/*
-  Copyright 2009 by Sean Luke and George Mason University
-  Licensed under the Academic Free License version 3.0
-  See the file "LICENSE" for more information
-*/
-
-package ex;
-
 import sim.engine.*;
 import sim.field.grid.*;
 import sim.util.*;
 
 
-public /*strictfp*/ class AntsForage extends SimState {
+public class Supermarket extends SimState {
 	private static final long serialVersionUID = 1;
 
 	public static final int GRID_HEIGHT = 100;
@@ -45,18 +37,17 @@ public /*strictfp*/ class AntsForage extends SimState {
 	public static final int FOOD = 2;
 
 
-	public int numAnts = 1000;
-	public int evaporationConstant = 1;
+	public int numCustomers = 1000;
 	public double randomActionProbability = 0.1;
 
 
 	// some properties
 	public int getNumAnts() {
-		return numAnts;
+		return numCustomers;
 	}
 
-	public void setNumAnts(int val) {
-		if (val > 0) numAnts = val;
+	public void setnumCustomers(int val) {
+		if (val > 0) numCustomers = val;
 	}
 
 	public Object domMomentumProbability() {
@@ -82,7 +73,7 @@ public /*strictfp*/ class AntsForage extends SimState {
 	public SparseGrid2D buggrid = new SparseGrid2D(GRID_WIDTH, GRID_HEIGHT);
 	public IntGrid2D obstacles = new IntGrid2D(GRID_WIDTH, GRID_HEIGHT, 0);
 
-	public AntsForage(long seed) {
+	public Supermarket(long seed) {
 		super(seed);
 	}
 
@@ -140,29 +131,29 @@ public /*strictfp*/ class AntsForage extends SimState {
 			for (int y = FOOD_YMIN; y <= FOOD_YMAX; y++)
 				sites.field[x][y] = FOOD;
 
-		for (int x = 0; x < numAnts; x++) {
-			Ant ant = new Ant();
-			buggrid.setObjectLocation(ant, (HOME_XMAX + HOME_XMIN) / 2, (HOME_YMAX + HOME_YMIN) / 2);
-			schedule.scheduleRepeating(Schedule.EPOCH + x, 0, ant, 1);
+		for (int x = 0; x < numCustomers; x++) {
+			Customer customer = new Customer();
+			buggrid.setObjectLocation(customer, (HOME_XMAX + HOME_XMIN) / 2, (HOME_YMAX + HOME_YMIN) / 2);
+			schedule.scheduleRepeating(Schedule.EPOCH + x, 0, customer, 1);
 		}
 
 		// Schedule evaporation to happen after the ants move and update
 		schedule.scheduleRepeating(Schedule.EPOCH, 1, new Steppable() {
 			public void step(SimState state) {
-				toFoodGrid.multiply(evaporationConstant);
-				toHomeGrid.multiply(evaporationConstant);
+				toFoodGrid.multiply(1);
+				toHomeGrid.multiply(1);
 			}
 		}, 1);
 
 	}
 
 	public static void main(String[] args) {
-		doLoop(AntsForage.class, args);
+		doLoop(Supermarket.class, args);
 		System.exit(0);
 	}
 }
-    
-    
-    
-    
-    
+
+
+
+
+

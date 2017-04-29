@@ -1,11 +1,3 @@
-/*
-  Copyright 2006 by Sean Luke and George Mason University
-  Licensed under the Academic Free License version 3.0
-  See the file "LICENSE" for more information
-*/
-
-package ex;
-
 import sim.portrayal.*;
 import sim.portrayal.simple.*;
 import sim.util.*;
@@ -13,7 +5,7 @@ import sim.engine.*;
 
 import java.awt.*;
 
-public class Ant extends OvalPortrayal2D implements Steppable {
+public class Customer extends OvalPortrayal2D implements Steppable {
 	private static final long serialVersionUID = 1;
 
 	public boolean getHasFoodItem() {
@@ -32,7 +24,7 @@ public class Ant extends OvalPortrayal2D implements Steppable {
 
 	Int2D last;
 
-	public Ant() {
+	public Customer() {
 	}
 
 	// at present we have only one algorithm: value iteration.  I might
@@ -40,60 +32,60 @@ public class Ant extends OvalPortrayal2D implements Steppable {
 
 
 	public void depositPheromone(final SimState state) {
-		final AntsForage af = (AntsForage) state;
+		final Supermarket supermarket = (Supermarket) state;
 
-		Int2D location = af.buggrid.getObjectLocation(this);
+		Int2D location = supermarket.buggrid.getObjectLocation(this);
 		int x = location.x;
 		int y = location.y;
 
-		if (AntsForage.ALGORITHM == AntsForage.ALGORITHM_VALUE_ITERATION) {
+		if (Supermarket.ALGORITHM == Supermarket.ALGORITHM_VALUE_ITERATION) {
 			// test all around
 			if (hasFoodItem)  // deposit food pheromone
 			{
-				double max = af.toFoodGrid.field[x][y];
+				double max = supermarket.toFoodGrid.field[x][y];
 				for (int dx = -1; dx < 2; dx++)
 					for (int dy = -1; dy < 2; dy++) {
 						int _x = dx + x;
 						int _y = dy + y;
-						if (_x < 0 || _y < 0 || _x >= AntsForage.GRID_WIDTH || _y >= AntsForage.GRID_HEIGHT)
+						if (_x < 0 || _y < 0 || _x >= Supermarket.GRID_WIDTH || _y >= Supermarket.GRID_HEIGHT)
 							continue;  // nothing to see here
-						double m = af.toFoodGrid.field[_x][_y] *
+						double m = supermarket.toFoodGrid.field[_x][_y] *
 								(dx * dy != 0 ? // diagonal corners
 										1 : 0.5) +
 								reward;
 						if (m > max) max = m;
 					}
-				af.toFoodGrid.field[x][y] = max;
+				supermarket.toFoodGrid.field[x][y] = max;
 			} else {
-				double max = af.toHomeGrid.field[x][y];
+				double max = supermarket.toHomeGrid.field[x][y];
 				for (int dx = -1; dx < 2; dx++)
 					for (int dy = -1; dy < 2; dy++) {
 						int _x = dx + x;
 						int _y = dy + y;
-						if (_x < 0 || _y < 0 || _x >= AntsForage.GRID_WIDTH || _y >= AntsForage.GRID_HEIGHT)
+						if (_x < 0 || _y < 0 || _x >= Supermarket.GRID_WIDTH || _y >= Supermarket.GRID_HEIGHT)
 							continue;  // nothing to see here
-						double m = af.toHomeGrid.field[_x][_y] *
+						double m = supermarket.toHomeGrid.field[_x][_y] *
 								(dx * dy != 0 ? // diagonal corners
 										1 : 0.5) +
 								reward;
 						if (m > max) max = m;
 					}
-				af.toHomeGrid.field[x][y] = max;
+				supermarket.toHomeGrid.field[x][y] = max;
 			}
 		}
 		reward = 0.0;
 	}
 
 	public void act(final SimState state) {
-		final AntsForage af = (AntsForage) state;
+		final Supermarket supermarket = (Supermarket) state;
 
-		Int2D location = af.buggrid.getObjectLocation(this);
+		Int2D location = supermarket.buggrid.getObjectLocation(this);
 		int x = location.x;
 		int y = location.y;
 
 		if (hasFoodItem)  // follow home pheromone
 		{
-			double max = AntsForage.IMPOSSIBLY_BAD_PHEROMONE;
+			double max = Supermarket.IMPOSSIBLY_BAD_PHEROMONE;
 			int max_x = x;
 			int max_y = y;
 			int count = 2;
@@ -103,9 +95,9 @@ public class Ant extends OvalPortrayal2D implements Steppable {
 					int _y = dy + y;
 					if ((dx == 0 && dy == 0) ||
 							_x < 0 || _y < 0 ||
-							_x >= AntsForage.GRID_WIDTH || _y >= AntsForage.GRID_HEIGHT ||
-							af.obstacles.field[_x][_y] == 1) continue;  // nothing to see here
-					double m = af.toHomeGrid.field[_x][_y];
+							_x >= Supermarket.GRID_WIDTH || _y >= Supermarket.GRID_HEIGHT ||
+							supermarket.obstacles.field[_x][_y] == 1) continue;  // nothing to see here
+					double m = supermarket.toHomeGrid.field[_x][_y];
 					if (m > max) {
 						count = 2;
 					}
@@ -122,29 +114,29 @@ public class Ant extends OvalPortrayal2D implements Steppable {
 				if (state.random.nextBoolean(1)) {
 					int xm = x + (x - last.x);
 					int ym = y + (y - last.y);
-					if (xm >= 0 && xm < AntsForage.GRID_WIDTH && ym >= 0 && ym < AntsForage.GRID_HEIGHT && af.obstacles.field[xm][ym] == 0) {
+					if (xm >= 0 && xm < Supermarket.GRID_WIDTH && ym >= 0 && ym < Supermarket.GRID_HEIGHT && supermarket.obstacles.field[xm][ym] == 0) {
 						max_x = xm;
 						max_y = ym;
 					}
 				}
-			} else if (state.random.nextBoolean(af.randomActionProbability))  // Maybe go randomly
+			} else if (state.random.nextBoolean(supermarket.randomActionProbability))  // Maybe go randomly
 			{
 				int xd = (state.random.nextInt(3) - 1);
 				int yd = (state.random.nextInt(3) - 1);
 				int xm = x + xd;
 				int ym = y + yd;
-				if (!(xd == 0 && yd == 0) && xm >= 0 && xm < AntsForage.GRID_WIDTH && ym >= 0 && ym < AntsForage.GRID_HEIGHT && af.obstacles.field[xm][ym] == 0) {
+				if (!(xd == 0 && yd == 0) && xm >= 0 && xm < Supermarket.GRID_WIDTH && ym >= 0 && ym < Supermarket.GRID_HEIGHT && supermarket.obstacles.field[xm][ym] == 0) {
 					max_x = xm;
 					max_y = ym;
 				}
 			}
-			af.buggrid.setObjectLocation(this, new Int2D(max_x, max_y));
-			if (af.sites.field[max_x][max_y] == AntsForage.HOME)  // reward me next time!  And change my status
+			supermarket.buggrid.setObjectLocation(this, new Int2D(max_x, max_y));
+			if (supermarket.sites.field[max_x][max_y] == Supermarket.HOME)  // reward me next time!  And change my status
 			{
 				hasFoodItem = !hasFoodItem;
 			}
 		} else {
-			double max = AntsForage.IMPOSSIBLY_BAD_PHEROMONE;
+			double max = Supermarket.IMPOSSIBLY_BAD_PHEROMONE;
 			int max_x = x;
 			int max_y = y;
 			int count = 2;
@@ -154,9 +146,9 @@ public class Ant extends OvalPortrayal2D implements Steppable {
 					int _y = dy + y;
 					if ((dx == 0 && dy == 0) ||
 							_x < 0 || _y < 0 ||
-							_x >= AntsForage.GRID_WIDTH || _y >= AntsForage.GRID_HEIGHT ||
-							af.obstacles.field[_x][_y] == 1) continue;  // nothing to see here
-					double m = af.toFoodGrid.field[_x][_y];
+							_x >= Supermarket.GRID_WIDTH || _y >= Supermarket.GRID_HEIGHT ||
+							supermarket.obstacles.field[_x][_y] == 1) continue;  // nothing to see here
+					double m = supermarket.toFoodGrid.field[_x][_y];
 					if (m > max) {
 						count = 2;
 					}
@@ -173,24 +165,24 @@ public class Ant extends OvalPortrayal2D implements Steppable {
 				if (state.random.nextBoolean(1)) {
 					int xm = x + (x - last.x);
 					int ym = y + (y - last.y);
-					if (xm >= 0 && xm < AntsForage.GRID_WIDTH && ym >= 0 && ym < AntsForage.GRID_HEIGHT && af.obstacles.field[xm][ym] == 0) {
+					if (xm >= 0 && xm < Supermarket.GRID_WIDTH && ym >= 0 && ym < Supermarket.GRID_HEIGHT && supermarket.obstacles.field[xm][ym] == 0) {
 						max_x = xm;
 						max_y = ym;
 					}
 				}
-			} else if (state.random.nextBoolean(af.randomActionProbability))  // Maybe go randomly
+			} else if (state.random.nextBoolean(supermarket.randomActionProbability))  // Maybe go randomly
 			{
 				int xd = (state.random.nextInt(3) - 1);
 				int yd = (state.random.nextInt(3) - 1);
 				int xm = x + xd;
 				int ym = y + yd;
-				if (!(xd == 0 && yd == 0) && xm >= 0 && xm < AntsForage.GRID_WIDTH && ym >= 0 && ym < AntsForage.GRID_HEIGHT && af.obstacles.field[xm][ym] == 0) {
+				if (!(xd == 0 && yd == 0) && xm >= 0 && xm < Supermarket.GRID_WIDTH && ym >= 0 && ym < Supermarket.GRID_HEIGHT && supermarket.obstacles.field[xm][ym] == 0) {
 					max_x = xm;
 					max_y = ym;
 				}
 			}
-			af.buggrid.setObjectLocation(this, new Int2D(max_x, max_y));
-			if (af.sites.field[max_x][max_y] == AntsForage.FOOD)  // reward me next time!  And change my status
+			supermarket.buggrid.setObjectLocation(this, new Int2D(max_x, max_y));
+			if (supermarket.sites.field[max_x][max_y] == Supermarket.FOOD)  // reward me next time!  And change my status
 			{
 				hasFoodItem = !hasFoodItem;
 			}
