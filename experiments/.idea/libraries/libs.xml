@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="libs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/examples/libs/portfolio.jar!/" />
+      <root url="jar://$PROJECT_DIR$/examples/libs/jmf.jar!/" />
+      <root url="jar://$PROJECT_DIR$/examples/libs/bsh-2.0b4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/examples/libs/jfreechart-1.0.17.jar!/" />
+      <root url="jar://$PROJECT_DIR$/examples/libs/jcommon-1.0.21.jar!/" />
+      <root url="jar://$PROJECT_DIR$/examples/libs/mason.18.jar!/" />
+      <root url="jar://$PROJECT_DIR$/examples/libs/itext-1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
