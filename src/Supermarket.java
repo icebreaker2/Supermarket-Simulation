@@ -48,11 +48,11 @@ public class Supermarket extends SimState {
 		}
 
 		// Schedule evaporation to happen after the customers move and update
-		schedule.scheduleRepeating(Schedule.EPOCH, 1, new Steppable() {
-			public void step(SimState state) {
-				//supermarketGrid.
+		schedule.scheduleRepeating(Schedule.EPOCH, 1, (Steppable) state -> {
+			if (supermarketGrid.getObjectsAtLocation(0, CHECKOUT_POSITION) != null) {
+				supermarketGrid.removeObjectsAtLocation(0, CHECKOUT_POSITION);
 			}
-		}, 1);
+		}, 20);
 	}
 
 	private int delayMovement() {
