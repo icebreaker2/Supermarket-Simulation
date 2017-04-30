@@ -68,7 +68,7 @@ public class Supermarket extends SimState {
 		}, 1);
 	}
 
-	// TODO: This is not working perfect. Variance does'nt scale.
+	// TODO: This is not working perfectly. Variance does'nt scale.
 	private boolean newCustomerArrived() {
 		if (checkoutCustomersAmount_mean-checkoutCustomersAmount_variance > random.nextGaussian()*checkoutCustomersAmount_variance+getNumberOfWaitingCustomers()) {
 			return true;
