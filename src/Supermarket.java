@@ -50,6 +50,10 @@ public class Supermarket extends SimState {
 				supermarketGrid.setObjectLocation(customer, 0, SPAWN_POSITION);
 				schedule.scheduleRepeating(customer, 1);
 			}
+		}, Math.round(Math.sqrt(checkoutProcessingTime_mean)));
+
+		schedule.scheduleRepeating(Schedule.EPOCH, 1, (Steppable) (SimState state) -> {
+
 
 			// Start checkout of customers
 			if (supermarketGrid.getObjectsAtLocation(0, CHECKOUT_POSITION) != null) {
