@@ -6,18 +6,18 @@ import java.awt.*;
 import javax.swing.*;
 
 public class SupermarketWithUI extends GUIState {
-	public Display2D display;
-	public JFrame displayFrame;
+	private Display2D display;
+	private JFrame displayFrame;
 
-	FastValueGridPortrayal2D checkstand = new FastValueGridPortrayal2D("Supermarket");
-	FastValueGridPortrayal2D sitesPortrayal = new FastValueGridPortrayal2D("Site", true);  // immutable
-	SparseGridPortrayal2D supermarketPortrayal = new SparseGridPortrayal2D();
+	private FastValueGridPortrayal2D checkout = new FastValueGridPortrayal2D("Supermarket");
+	private FastValueGridPortrayal2D sitesPortrayal = new FastValueGridPortrayal2D("Site", true);  // immutable
+	private SparseGridPortrayal2D supermarketPortrayal = new SparseGridPortrayal2D();
 
 	public static void main(String[] args) {
 		new SupermarketWithUI().createController();
 	}
 
-	public SupermarketWithUI() {
+	private SupermarketWithUI() {
 		super(new Supermarket(System.currentTimeMillis()));
 	}
 
@@ -34,13 +34,13 @@ public class SupermarketWithUI extends GUIState {
 		return "Supermarket Simulation";
 	}
 
-	public void setupPortrayals() {
+	private void setupPortrayals() {
 
 		Supermarket supermarket = (Supermarket) state;
 
 		// tell the portrayals what to portray and how to portray them
-		checkstand.setField(supermarket.toCheckstandGrid);
-		checkstand.setMap(new sim.util.gui.SimpleColorMap(
+		checkout.setField(supermarket.toCheckoutGrid);
+		checkout.setMap(new sim.util.gui.SimpleColorMap(
 				0, 3,
 				// home pheromones are beneath all, just make them opaque
 				Color.white, //new Color(0,255,0,0),
@@ -56,7 +56,7 @@ public class SupermarketWithUI extends GUIState {
 				1,
 				new Color(0, 0, 0, 0),
 				new Color(255, 0, 0, 255)));
-		supermarketPortrayal.setField(supermarket.supermarketgrid);
+		supermarketPortrayal.setField(supermarket.supermarketGrid);
 		// reschedule the displayer
 		display.reset();
 
@@ -86,7 +86,7 @@ public class SupermarketWithUI extends GUIState {
 		displayFrame.setVisible(true);
 
 		// attach the portrayals from bottom to top
-		display.attach(checkstand, "Checkstand");
+		display.attach(checkout, "Checkout");
 		display.attach(sitesPortrayal, "Site Locations");
 		display.attach(supermarketPortrayal, "Agents");
 
