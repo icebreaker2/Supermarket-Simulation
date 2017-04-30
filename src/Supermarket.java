@@ -41,23 +41,27 @@ public class Supermarket extends SimState {
 		for (int x = 0; x < numCustomers; x++) {
 			Customer customer = new Customer();
 			supermarketGrid.setObjectLocation(customer, 0, SPAWN_POSITION);
-			int delay = delayMovement();
 
 			// The customer spawns at the given time
-			schedule.scheduleRepeating(Schedule.EPOCH + delay, 0, customer, 1);
+			schedule.scheduleRepeating(Schedule.EPOCH + delayCustomerStart(), 0, customer, 1);
 		}
 
 		// Schedule evaporation to happen after the customers move and update
 		schedule.scheduleRepeating(Schedule.EPOCH, 1, (Steppable) state -> {
 			if (supermarketGrid.getObjectsAtLocation(0, CHECKOUT_POSITION) != null) {
-				supermarketGrid.removeObjectsAtLocation(0, CHECKOUT_POSITION);
+				Customer customer = (Customer) supermarketGrid.getObjectsAtLocation(0, CHECKOUT_POSITION).get(0);
+				customer.startCheckOut(getCheckoutTime());
 			}
 		}, 20);
 	}
 
-	private int delayMovement() {
-		return (int) (Math.random() * 1000);
+	private int delayCustomerStart() {
+		return (int) (Math.random() * 10000);
 		// TODO this spawn has to be delayed by a normal deviation
+	}
+
+	private int getCheckoutTime() {
+		return (int) (Math.random() * 100);
 	}
 
 	// getter and setter for the model
