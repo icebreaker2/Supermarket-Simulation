@@ -32,8 +32,6 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 			// Customer at the checkout?
 			if (checkOutProcessingTotalTime != 0) {
 
-				System.out.println("Checkout after: " + (checkOutProcessingTotalTime-checkOutProcessingCurrentTime));
-
 				// Leave supermarket if checkout finished
 				if (checkOutProcessingCurrentTime == checkOutProcessingTotalTime) {
 					supermarket.supermarketGrid.remove(this);
