@@ -7,9 +7,6 @@ import java.awt.*;
 
 public class Customer extends OvalPortrayal2D implements Steppable {
 
-	private int checkOutProcessingCurrentTime = 0;
-	private int checkOutProcessingTotalTime = 0;
-
 	public Customer() {
 	}
 
@@ -24,27 +21,11 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 			// Look forward
 			Bag objectsAtNextLocation = supermarket.supermarketGrid.getObjectsAtLocation(0, location.y + 1);
 
-			// Step forward if possible (no self checkout)
+			// Step forward if possible (but no self checkout)
 			if (objectsAtNextLocation == null && location.y != supermarket.CHECKOUT_POSITION) {
 				supermarket.supermarketGrid.setObjectLocation(this, 0, location.y + 1);
 			}
-
-			// Customer at the checkout?
-			if (checkOutProcessingTotalTime != 0) {
-
-				// Leave supermarket if checkout finished
-				if (checkOutProcessingCurrentTime == checkOutProcessingTotalTime) {
-					supermarket.supermarketGrid.remove(this);
-				}
-
-				checkOutProcessingCurrentTime++;
-			}
 		}
-	}
-
-	public void startCheckOut(int checkOutProcessingTotalTime) {
-		this.checkOutProcessingTotalTime = checkOutProcessingTotalTime;
-		checkOutProcessingCurrentTime = 1;
 	}
 
 	public final void draw(Object object, Graphics2D graphics, DrawInfo2D info) {

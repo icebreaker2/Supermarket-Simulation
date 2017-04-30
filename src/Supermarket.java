@@ -1,4 +1,3 @@
-import ec.util.MersenneTwisterFast;
 import sim.engine.*;
 import sim.field.grid.*;
 
@@ -13,9 +12,11 @@ public class Supermarket extends SimState {
 	public static final int CHECKOUT_POINT = 2;
 
 	// some initial properties
-	private int numCustomers = 1440;
-	private int checkoutCustomersAmount_variance = 4;
-	private int checkoutProcessingTime_variance = 5;
+	private double checkoutCustomersAmount_mean = 12.0;
+	private double checkoutCustomersAmount_variance = 4.0;
+	private double checkoutProcessingTime_mean = 30.0;
+	private double checkoutProcessingTime_variance = 5.0;
+	private int totalCustomersAmount = 0;
 
 	public IntGrid2D sites;
 	public SparseGrid2D supermarketGrid;
@@ -23,7 +24,6 @@ public class Supermarket extends SimState {
 	public static final int GRID_HEIGHT = 50;
 	public static final int GRID_WIDTH = 1;
 
-	MersenneTwisterFast checkOutTimeGenerator = new MersenneTwisterFast();
 	Customer customerAtCheckout; // Just a reference
 
 	public Supermarket(long seed) {
@@ -41,57 +41,91 @@ public class Supermarket extends SimState {
 		sites.field[0][SPAWN_POSITION] = SPAWN_POINT;
 		sites.field[0][CHECKOUT_POSITION] = CHECKOUT_POINT;
 
-		// Position the customers
-		for (int x = 0; x < numCustomers; x++) {
-			Customer customer = new Customer();
-			supermarketGrid.setObjectLocation(customer, 0, SPAWN_POSITION);
+		schedule.scheduleRepeating(Schedule.EPOCH, 1, (Steppable) (SimState state) -> {
 
-			// The customer spawns at the given time
-			schedule.scheduleRepeating(Schedule.EPOCH + delayCustomerStart(), 0, customer, 1);
-		}
+			// Add new Customers
+			if (newCustomerArrived()) {
+				Customer customer = new Customer();
+				totalCustomersAmount++;
+				supermarketGrid.setObjectLocation(customer, 0, SPAWN_POSITION);
+				schedule.scheduleRepeating(customer, 1);
+			}
 
-		// Schedule evaporation to happen after the customers move and update
-		schedule.scheduleRepeating(Schedule.EPOCH, 1, (Steppable) state -> {
+			// Start checkout of customers
 			if (supermarketGrid.getObjectsAtLocation(0, CHECKOUT_POSITION) != null) {
 				Customer customer = (Customer) supermarketGrid.getObjectsAtLocation(0, CHECKOUT_POSITION).get(0);
 				if (customer != customerAtCheckout) {
-					customer.startCheckOut(getCheckoutTime());
+					schedule.scheduleOnceIn(getCheckoutTime(), (Steppable) (SimState leaveState) -> {
+						supermarketGrid.remove(customer);
+					});
 					customerAtCheckout = customer;
 				}
 			}
-		}, 20);
+		}, 1);
 	}
 
-	private int delayCustomerStart() {
-		return (int) (Math.random() * 43200); // 60*60*12 = 43200 opening seconds per day
+	// TODO: This is not working properly. Variance always adds to the mean and does'nt scale.
+	private boolean newCustomerArrived() {
+		if (checkoutCustomersAmount_mean-checkoutCustomersAmount_variance > random.nextGaussian()*checkoutCustomersAmount_variance+getNumberOfWaitingCustomers()) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	private int getCheckoutTime() {
-		return (int) Math.round(checkOutTimeGenerator.nextGaussian()*5.0+30.0);
+		int checkoutTime = (int) Math.round(random.nextGaussian()*checkoutProcessingTime_variance+checkoutProcessingTime_mean);
+
+		// Checkout time must be positive
+		if (checkoutTime > 0) {
+			return checkoutTime;
+		} else {
+			return 1;
+		}
 	}
 
 	// getter and setter for the model
-	public int getCheckoutCustomersAmount_variance() {
+	public double getCheckoutCustomersAmount_variance() {
 		return checkoutCustomersAmount_variance;
 	}
 
-	public void setCheckoutCustomersAmount_variance(int checkoutCustomersAmount_variance) {
+	public void setCheckoutCustomersAmount_variance(double checkoutCustomersAmount_variance) {
 		this.checkoutCustomersAmount_variance = checkoutCustomersAmount_variance;
 	}
 
-	public int getCheckoutProcessingTime_variance() {
+	public double getCheckoutCustomersAmount_mean() {
+		return checkoutCustomersAmount_mean;
+	}
+
+	public void setCheckoutCustomersAmount_mean(double checkoutCustomersAmount_mean) {
+		this.checkoutCustomersAmount_mean = checkoutCustomersAmount_mean;
+	}
+
+	public double getCheckoutProcessingTime_variance() {
 		return checkoutProcessingTime_variance;
 	}
 
-	public void setCheckoutProcessingTime_variance(int checkoutProcessingTime_variance) {
+	public void setCheckoutProcessingTime_variance(double checkoutProcessingTime_variance) {
 		this.checkoutProcessingTime_variance = checkoutProcessingTime_variance;
 	}
 
-	public int getNumCustomers() {
-		return numCustomers;
+	public double getCheckoutProcessingTime_mean() {
+		return checkoutProcessingTime_mean;
 	}
 
-	public void setNumCustomers(int val) {
-		if (val > 0) numCustomers = val;
+	public void setCheckoutProcessingTime_mean(double checkoutProcessingTime_mean) {
+		this.checkoutProcessingTime_mean = checkoutProcessingTime_mean;
+	}
+
+	public int getNumberOfWaitingCustomers() {
+		if (supermarketGrid != null) {
+			return supermarketGrid.getAllObjects().size();
+		} else {
+			return 0;
+		}
+	}
+
+	public int getTotalCustomersAmount() {
+		return totalCustomersAmount;
 	}
 }
