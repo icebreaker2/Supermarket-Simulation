@@ -17,7 +17,7 @@ public class SupermarketWithUI extends GUIState {
 		new SupermarketWithUI().createController();
 	}
 
-	private SupermarketWithUI() {
+	public SupermarketWithUI() {
 		super(new Supermarket(System.currentTimeMillis()));
 	}
 
