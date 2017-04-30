@@ -10,49 +10,45 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 
 	private boolean isInQueue = false;
 
-	private long processingDelay = -1;
-	private long ownTotalWaitingTime = -1;
-	private final int canLeaveCheckstand = 0;
+	private long ownCheckoutDuration = -1;
+	private long ownTotalDuration = -1;
+	private final int canLeaveCheckout = 0;
 
-	Int2D last;
+	private Int2D last;
 
 	public Customer() {
 	}
 
 	public void step(final SimState state) {
-		final Supermarket supermarket = (Supermarket) state;
+		Supermarket supermarket = (Supermarket) state;
 
-		Int2D location = supermarket.supermarketgrid.getObjectLocation(this);
+		Int2D location = supermarket.supermarketGrid.getObjectLocation(this);
 		int x = location.x;
 		int y = location.y;
 
-		if (x == supermarket.CHECKSTAND_X && y == supermarket.CHECKSTAND_Y && processingDelay != canLeaveCheckstand) { // wait at the checkstand
+		// If next person reaches checkout or last in line
+		if (reachedEndOfLine(x, y) && ownCheckoutDuration != canLeaveCheckout) {
 			if (!isInQueue) {
-				// TODO implement the queue and compute the processing delay at the checkstand. I suggest the following:
-			/*
-				1. Compute a normal deviated delay in steps
-				2. set processingDelay to the computed delay and add the delays of the customers in that are top of this customer (see the queue of the customers in front)
-				3. decrease processingDelay each step
-				4. If processingDelay is 0 again the customer leaves to the left as he would before
-				See the delay of random steps hardcoded
-			 */
-				// compute the delay in addition to the own wating time
-				processingDelay = (long) (Math.random()*500); // delaying steps for the processing time at the checkstand
-				ownTotalWaitingTime = processingDelay + Supermarket.computeDelayFromTheTop(); // take the other processing times of customer ahead into account
-				// add yourself to the list of waiting customers
-				Supermarket.addCustomerToCheckstandQueue(this);
-				isInQueue = !isInQueue;
-			} else {
-				processingDelay--;
-			}
+				// compute the delay in addition to the own waiting time
+				ownCheckoutDuration = (long) (Math.random() * 500);
+				ownTotalDuration = ownCheckoutDuration + Supermarket.currentLineTotalDuration();
 
+				// add current person to the list of waiting customers
+				Supermarket.addCustomerToCheckoutQueue(this);
+				isInQueue = true;
+			} else {
+				ownCheckoutDuration--;
+			}
 		} else {
-			// now go straight left to the checkstand
-			supermarket.supermarketgrid.setObjectLocation(this, new Int2D(x - 1, y)); // run straight to the checkstand
+			// Move dots to checkout or end of line
+			supermarket.supermarketGrid.setObjectLocation(this, new Int2D(x - 1, y));
 		}
 
-
 		last = location;
+	}
+
+	private boolean reachedEndOfLine(int x, int y) {
+		return (x == Supermarket.CHECKOUT_X && y == Supermarket.CHECKOUT_Y);
 	}
 
 	public final void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
@@ -67,7 +63,7 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 
 	}
 
-	public long getProcessingDelay() {
-		return processingDelay;
+	public long getOwnCheckoutDuration() {
+		return ownCheckoutDuration;
 	}
 }
