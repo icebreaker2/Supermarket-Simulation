@@ -1,3 +1,4 @@
+import ec.util.MersenneTwisterFast;
 import sim.engine.*;
 import sim.field.grid.*;
 
@@ -12,7 +13,7 @@ public class Supermarket extends SimState {
 	public static final int CHECKOUT_POINT = 2;
 
 	// some initial properties
-	private int numCustomers = 100;
+	private int numCustomers = 1440;
 	private int checkoutCustomersAmount_variance = 4;
 	private int checkoutProcessingTime_variance = 5;
 
@@ -21,6 +22,9 @@ public class Supermarket extends SimState {
 
 	public static final int GRID_HEIGHT = 50;
 	public static final int GRID_WIDTH = 1;
+
+	MersenneTwisterFast checkOutTimeGenerator = new MersenneTwisterFast();
+	Customer customerAtCheckout; // Just a reference
 
 	public Supermarket(long seed) {
 		super(seed);
@@ -50,18 +54,20 @@ public class Supermarket extends SimState {
 		schedule.scheduleRepeating(Schedule.EPOCH, 1, (Steppable) state -> {
 			if (supermarketGrid.getObjectsAtLocation(0, CHECKOUT_POSITION) != null) {
 				Customer customer = (Customer) supermarketGrid.getObjectsAtLocation(0, CHECKOUT_POSITION).get(0);
-				customer.startCheckOut(getCheckoutTime());
+				if (customer != customerAtCheckout) {
+					customer.startCheckOut(getCheckoutTime());
+					customerAtCheckout = customer;
+				}
 			}
 		}, 20);
 	}
 
 	private int delayCustomerStart() {
-		return (int) (Math.random() * 10000);
-		// TODO this spawn has to be delayed by a normal deviation
+		return (int) (Math.random() * 43200); // 60*60*12 = 43200 opening seconds per day
 	}
 
 	private int getCheckoutTime() {
-		return (int) (Math.random() * 100);
+		return (int) Math.round(checkOutTimeGenerator.nextGaussian()*5.0+30.0);
 	}
 
 	// getter and setter for the model
