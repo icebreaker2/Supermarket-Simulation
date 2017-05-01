@@ -43,14 +43,18 @@ public class Supermarket extends SimState {
 
 		schedule.scheduleRepeating(Schedule.EPOCH, 1, (Steppable) (SimState state) -> {
 
-			// Add new Customers
-			if (newCustomerArrived()) {
-				Customer customer = new Customer();
-				totalCustomersAmount++;
-				supermarketGrid.setObjectLocation(customer, 0, SPAWN_POSITION);
-				schedule.scheduleRepeating(customer, 1);
+			// Synchronize customer spawn with checkout queue
+			if (schedule.getSteps() % Math.round(Math.sqrt(checkoutProcessingTime_mean)) == 0) {
+
+				// Add new Customers
+				if (newCustomerArrived()) {
+					Customer customer = new Customer();
+					totalCustomersAmount++;
+					supermarketGrid.setObjectLocation(customer, 0, SPAWN_POSITION);
+					schedule.scheduleRepeating(customer, 1);
+				}
 			}
-		}, Math.round(Math.sqrt(checkoutProcessingTime_mean)));
+		}, 1);
 
 		schedule.scheduleRepeating(Schedule.EPOCH, 1, (Steppable) (SimState state) -> {
 
@@ -68,7 +72,6 @@ public class Supermarket extends SimState {
 		}, 1);
 	}
 
-	// TODO: This is not working perfectly. Variance does'nt scale.
 	private boolean newCustomerArrived() {
 		if (checkoutCustomersAmount_mean-checkoutCustomersAmount_variance > random.nextGaussian()*checkoutCustomersAmount_variance+getNumberOfWaitingCustomers()) {
 			return true;
