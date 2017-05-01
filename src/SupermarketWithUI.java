@@ -40,14 +40,14 @@ public class SupermarketWithUI extends GUIState {
 		Supermarket supermarket = (Supermarket) state;
 
 		// tell the portrayals what to portray and how to portray them
-		customersPortrayal.setField(supermarket.supermarketGrid);
-		sitesPortrayal.setField(supermarket.sites);
+		customersPortrayal.setField(supermarket.customerGrid);
+		sitesPortrayal.setField(supermarket.supermarketMap);
 
-		// Set colors for sites
+		// Set colors for supermarketMap
 		Color[] colorMap = new Color[3];
 		colorMap[0] = new Color(0, 0, 0, 0);
-		colorMap[supermarket.SPAWN_POINT] = new Color(0, 255, 0, 255);
-		colorMap[supermarket.CHECKOUT_POINT] = new Color(255, 0, 0, 255);
+		colorMap[supermarket.SPAWN_POINT_ID] = new Color(0, 255, 0, 255);
+		colorMap[supermarket.CHECKOUT_POINT_ID] = new Color(255, 0, 0, 255);
 		sitesPortrayal.setMap(new SimpleColorMap(colorMap));
 
 		// reschedule the displayer

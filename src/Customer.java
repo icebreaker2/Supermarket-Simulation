@@ -13,17 +13,17 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 	public void step(final SimState state) {
 		Supermarket supermarket = (Supermarket) state;
 
-		Int2D location = supermarket.supermarketGrid.getObjectLocation(this);
+		Int2D location = supermarket.customerGrid.getObjectLocation(this);
 
 		// Customer still in the supermarket?
 		if (location != null) {
 
 			// Look forward
-			Bag objectsAtNextLocation = supermarket.supermarketGrid.getObjectsAtLocation(0, location.y + 1);
+			Bag objectsAtNextLocation = supermarket.customerGrid.getObjectsAtLocation(0, location.y + 1);
 
 			// Step forward if possible (but no self checkout)
 			if (objectsAtNextLocation == null && location.y != supermarket.CHECKOUT_POSITION) {
-				supermarket.supermarketGrid.setObjectLocation(this, 0, location.y + 1);
+				supermarket.customerGrid.setObjectLocation(this, 0, location.y + 1);
 			}
 		}
 	}
