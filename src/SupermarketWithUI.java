@@ -6,35 +6,58 @@ import sim.util.gui.SimpleColorMap;
 import java.awt.*;
 import javax.swing.*;
 
+/**
+ * This is our visual representation of the supermarket model.
+ */
 public class SupermarketWithUI extends GUIState {
 
 	private Display2D display;
 	private JFrame displayFrame;
 
-	private FastValueGridPortrayal2D sitesPortrayal = new FastValueGridPortrayal2D("Sites", false);
+	private FastValueGridPortrayal2D sitesPortrayal = new FastValueGridPortrayal2D("Supermarket Map", false);
 	private SparseGridPortrayal2D customersPortrayal = new SparseGridPortrayal2D();
 
+	/**
+	 * Enter the program here
+ 	 */
 	public static void main(String[] args) {
 		new SupermarketWithUI().createController();
 	}
 
+	/**
+	 * Start the Simulation at time 0
+	 */
 	public SupermarketWithUI() {
 		super(new Supermarket(System.currentTimeMillis()));
 	}
 
+
+	/**
+	 * Start the Simulation with a given state
+	 *
+	 * @param state The state to start at
+	 */
 	public SupermarketWithUI(SimState state) {
 		super(state);
 	}
 
-	// allow the user to inspect the model
+	/**
+	 * Allow the user to inspect the model
+ 	 */
 	public Object getSimulationInspectedObject() {
 		return state;
 	}
 
+	/**
+	 * @return The name of the simulation
+	 */
 	public static String getName() {
 		return "Supermarket Simulation";
 	}
 
+	/**
+	 * Set up our views
+	 */
 	private void setupPortrayals() {
 
 		Supermarket supermarket = (Supermarket) state;
@@ -57,25 +80,36 @@ public class SupermarketWithUI extends GUIState {
 		display.repaint();
 	}
 
+	/**
+	 * Start the simulation
+	 */
 	public void start() {
 		super.start();  // set up everything but replacing the display
 		// set up our portrayals
 		setupPortrayals();
 	}
 
+	/**
+	 * Load a specific state
+	 * @param state The state to be simulated
+	 */
 	public void load(SimState state) {
 		super.load(state);
 		// we now have new grids. Set up the portrayals to reflect that
 		setupPortrayals();
 	}
 
-	public void init(Controller c) {
-		super.init(c);
+	/**
+	 * Initialize the view
+	 * @param controller Initial controller
+	 */
+	public void init(Controller controller) {
+		super.init(controller);
 
 		// Make the Display2D. We'll have it display stuff later.
 		display = new Display2D(10, 510, this); // At 10x510, we've got 10x10 per array position
 		displayFrame = display.createFrame();
-		c.registerFrame(displayFrame);   // Register the frame so it appears in the "Display" list
+		controller.registerFrame(displayFrame);   // Register the frame so it appears in the "Display" list
 		displayFrame.setVisible(true);
 
 		// attach the portrayals from bottom to top
@@ -86,6 +120,9 @@ public class SupermarketWithUI extends GUIState {
 		display.setBackdrop(Color.gray);
 	}
 
+	/**
+	 * Quit the simulation
+	 */
 	public void quit() {
 		super.quit();
 

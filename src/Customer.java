@@ -5,11 +5,19 @@ import sim.engine.*;
 
 import java.awt.*;
 
+/**
+ * This is our model for a single customer (agent) waiting in the supermarket queue
+ */
 public class Customer extends OvalPortrayal2D implements Steppable {
 
 	public Customer() {
 	}
 
+	/**
+	 * Act according to the current environment
+	 *
+	 * @param state The current state of the supermarket
+	 */
 	public void step(final SimState state) {
 		Supermarket supermarket = (Supermarket) state;
 
@@ -28,6 +36,13 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 		}
 	}
 
+	/**
+	 * Draw the customer
+	 *
+	 * @param object The customer
+	 * @param graphics The drawing
+	 * @param info Infos about the canvas
+	 */
 	public final void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
 
 		graphics.setColor(Color.black);
