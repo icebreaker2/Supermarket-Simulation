@@ -1,3 +1,5 @@
+package de.uni_oldenburg.simulation.supermarket;
+
 import sim.portrayal.*;
 import sim.portrayal.simple.*;
 import sim.util.*;
