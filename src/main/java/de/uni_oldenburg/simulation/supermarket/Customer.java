@@ -1,5 +1,6 @@
 package de.uni_oldenburg.simulation.supermarket;
 
+import ec.util.MersenneTwisterFast;
 import sim.portrayal.*;
 import sim.portrayal.simple.*;
 import sim.util.*;
@@ -14,12 +15,12 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 
 	private int age;
 	private double stressLevel;
-	private int amountOfAttendant; // TODO hard to implement
+	private int lovesCashierAtCheckoutX;
 
-	public Customer(int age, double stressLevel, int amountOfAttendant) {
+	public Customer(int age, double stressLevel, int lovesCashierAtCheckoutX) {
 		this.age = age;
 		this.stressLevel = stressLevel;
-		this.amountOfAttendant = amountOfAttendant;
+		this.lovesCashierAtCheckoutX = lovesCashierAtCheckoutX;
 	}
 
 	/**
@@ -36,30 +37,38 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 		if (location != null) {
 
 			// Look forward in every direction
-			Bag [] objectsAtNextLocation = new Bag [Supermarket.GRID_WIDTH];
+			Bag[] objectsAtNextLocation = new Bag[Supermarket.GRID_WIDTH];
 			for (int i = 0; i < Supermarket.GRID_WIDTH; i++) {
 				objectsAtNextLocation[i] = supermarket.customerGrid.getObjectsAtLocation((location.x + i) % Supermarket.GRID_WIDTH, location.y + 1);
 			}
 
 			// Step forward or to next free place to the left if possible (but no self checkout)
-			for (int i = 0; i < Supermarket.GRID_WIDTH; i++) {
-				int shortesQueue = supermarket.getShortestQueue();
-				System.out.println(shortesQueue);
-				if (objectsAtNextLocation[i] == null && location.y != Supermarket.CHECKOUT_POSITION_Y && (location.x + i) % Supermarket.GRID_WIDTH == shortesQueue /* all at the shortest queue */) {
+			if (location.y != Supermarket.CHECKOUT_POSITION_Y) {
+				for (int i = 0; i < Supermarket.GRID_WIDTH; i++) {
+					int shortesQueue = supermarket.getShortestQueue();
+					boolean isWillingToSwitchQueue = computeWillingness(supermarket, location.x);
 					// TODO take other params into account
-					supermarket.customerGrid.setObjectLocation(this, (location.x + i) % Supermarket.GRID_WIDTH, location.y + 1);
+					if (isWillingToSwitchQueue) {
+						if (objectsAtNextLocation[i] == null && (location.x + i) % Supermarket.GRID_WIDTH == shortesQueue /* all at the shortest queue */) {
+							supermarket.customerGrid.setObjectLocation(this, (location.x + i) % Supermarket.GRID_WIDTH, location.y + 1);
+						}
+					} else {
+						if (objectsAtNextLocation[location.x] == null) {
+							supermarket.customerGrid.setObjectLocation(this, location.x, location.y + 1);
+						}
+					}
+
 				}
 			}
-
 		}
 	}
 
 	/**
 	 * Draw the customer
 	 *
-	 * @param object The customer
+	 * @param object   The customer
 	 * @param graphics The drawing
-	 * @param info Infos about the canvas
+	 * @param info     Infos about the canvas
 	 */
 	public final void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
 
@@ -73,8 +82,33 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 	}
 
 	/**
+	 * Computes the willingness of the customer to switch the checkout queue. Takes age and stressLevel into account
+	 *
+	 * @param supermarket is the supermarket of the customer
+	 * @param currentXLocation is the current x coordinate of the customer
+	 * @return a boolean value indicating whether the customer is willing to switch to another queue (1) or not (0)
+	 */
+	private boolean computeWillingness(Supermarket supermarket, int currentXLocation) {
+		// TODO improve with another distribution function?!
+		if (age >= supermarket.getCustomersAge_mean()){ // old people are calm
+			if (stressLevel <= supermarket.getCustomersStressLevel_mean() && lovesCashierAtCheckoutX != currentXLocation) {
+				return false;
+			} else if (lovesCashierAtCheckoutX == currentXLocation) {
+				return (new MersenneTwisterFast().nextDouble() >= 0.5); // throw dice to decide, old people do not need love by all means
+			}
+		} else { // do not hesitate
+			if (lovesCashierAtCheckoutX == currentXLocation) {
+				return false;
+			} else
+				return !(stressLevel <= supermarket.getCustomersStressLevel_mean() && lovesCashierAtCheckoutX != currentXLocation);
+		}
+		return true; // default
+	}
+
+	/**
 	 * Computes the customers age normal deviated given by the mean and variance passed
-	 * @param mean age of the customers
+	 *
+	 * @param mean     age of the customers
 	 * @param variance of the normal distribution for the customers age
 	 * @return the normal deviated age
 	 */
@@ -85,8 +119,9 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 	}
 
 	/**
-	 * Computes the customers stress level normal deviated given by the mean and vairance passed
-	 * @param mean stress level of the customers
+	 * Computes the customers stress level normal deviated given by the mean and variance passed
+	 *
+	 * @param mean     stress level of the customers
 	 * @param variance of the normal distribution of the customers stress level
 	 * @return the normal deviated stress level
 	 */
@@ -94,5 +129,19 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 		double wantedProbability = Math.random(); // between 0 and 1
 		int maxNumberOfX = 10; // this is actually not a max stressLevel but a highly unlikely stressLevel for customers
 		return Auxiliary.solveNormalDeviationForX(mean, variance, wantedProbability, maxNumberOfX);
+	}
+
+	/**
+	 * Computes the customers love for one of the cashier normal deviated given by the mean and variance passed
+	 *
+	 * @param mean     love of the customer for cashier at checkout x
+	 * @param variance of the normal distribution of the customers love for the cashier at checkout x
+	 * @return the normal deviated cashier the customers fell in love with
+	 */
+	public static int computelovesCashierAtCheckoutXNormalDeviated(double mean, double variance) {
+
+		double wantedProbability = Math.random(); // between 0 and 1
+		int maxNumberOfX = Supermarket.GRID_WIDTH-1;
+		return Auxiliary.solveNormalDeviationForX(mean, variance, wantedProbability, maxNumberOfX) % Supermarket.GRID_WIDTH /*Prevents wrong params */;
 	}
 }

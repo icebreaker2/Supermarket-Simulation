@@ -26,6 +26,8 @@ public class Supermarket extends SimState {
 	private double customersAge_variance = 4.0;
 	private double customersStressLevel_mean = 5.0;
 	private double customersStressLevel_variance = 1.5;
+	private double customersLovesCashierAtCheckoutX_mean = 2; // if set to high the modulus will decrease it
+	private double customersLovesCashierAtCheckoutX_variance = 1.5;
 
 	private int totalCustomersAmount = 0;
 
@@ -68,7 +70,7 @@ public class Supermarket extends SimState {
 				// Add new customers randomly
 				if (newCustomerArrived()) {
 					// set customers properties and the customer itself
-					Customer customer = new Customer(Customer.computeAgeNormalDeviated(customersAge_mean, customersAge_variance), Customer.computeStressLevelNormalDeviated(customersStressLevel_mean, customersStressLevel_variance), 0);
+					Customer customer = new Customer(Customer.computeAgeNormalDeviated(customersAge_mean, customersAge_variance), Customer.computeStressLevelNormalDeviated(customersStressLevel_mean, customersStressLevel_variance), Customer.computelovesCashierAtCheckoutXNormalDeviated(customersLovesCashierAtCheckoutX_mean, customersLovesCashierAtCheckoutX_variance));
 					totalCustomersAmount++;
 					int[] spawnLocation = createSpawnLocation(); // x,y coordinates
 					customerGrid.setObjectLocation(customer, spawnLocation[0], spawnLocation[1]);
@@ -156,6 +158,14 @@ public class Supermarket extends SimState {
 			}
 		}
 		return -1;
+	}
+
+	public double getCustomersLovesCashierAtCheckoutX_mean() {
+		return customersLovesCashierAtCheckoutX_mean;
+	}
+
+	public void setCustomersLovesCashierAtCheckoutX_mean(double customersLovesCashierAtCheckoutX_mean) {
+		this.customersLovesCashierAtCheckoutX_mean = customersLovesCashierAtCheckoutX_mean;
 	}
 
 	public double getCustomersAge_mean() {
