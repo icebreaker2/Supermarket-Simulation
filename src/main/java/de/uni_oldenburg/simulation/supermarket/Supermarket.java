@@ -2,6 +2,9 @@ package de.uni_oldenburg.simulation.supermarket;
 
 import sim.engine.*;
 import sim.field.grid.*;
+import sim.util.distribution.Normal;
+
+import javax.rmi.PortableRemoteObject;
 
 /**
  * This is our simulation model for a supermarket.
@@ -65,17 +68,17 @@ public class Supermarket extends SimState {
 		// Dynamically spawn new customers
 		schedule.scheduleRepeating(Schedule.EPOCH, 1, (Steppable) (SimState state) -> {
 
-			// Synchronize customer spawn with checkout queue
-			for (int i = 0; i < GRID_WIDTH; i++) {
-				if (schedule.getSteps() % Math.round(Math.sqrt(checkoutProcessingTime_mean)) == i) {
-					// Add new customers randomly
-					if (newCustomerArrived()) {
-						Customer customer = new Customer();
-						totalCustomersAmount++;
-						int[] spawnLocation = createSpawnLocation(); // x,y coordinates
-						customerGrid.setObjectLocation(customer, spawnLocation[0], spawnLocation[1]);
-						schedule.scheduleRepeating(customer, 1);
-					}
+			double wantedProbability = this.random.nextDouble(true, true);
+			int newCustomers = solveNormalDeviationForX(checkoutCustomersAmount_mean, checkoutCustomersAmount_variance, wantedProbability);
+
+			for (int i = 0; i < newCustomers; i++) {
+				// Add new customers randomly
+				if (newCustomerArrived()) {
+					Customer customer = new Customer();
+					totalCustomersAmount++;
+					int[] spawnLocation = createSpawnLocation(); // x,y coordinates
+					customerGrid.setObjectLocation(customer, spawnLocation[0], spawnLocation[1]);
+					schedule.scheduleRepeating(customer, 1);
 				}
 			}
 		}, 1);
@@ -96,6 +99,26 @@ public class Supermarket extends SimState {
 				}
 			}
 		}, 1);
+	}
+
+	private int solveNormalDeviationForX(double mean, double variance, double wantedProbability) {
+		// we need a fix to solve for x but it is quite easy for our integers of customers
+		int maxNumberOfCustomers = 1000; // this is acutally not a max number of customers but a way unlikely number of customers
+		double lastProbability = 0;
+		for (int x = 0; x < maxNumberOfCustomers; x++) {
+			Normal normalDeviation = new Normal(mean, Math.pow(variance, 2), this.random);
+			double probabilty = normalDeviation.cdf(x); // solves P(X<=x)
+			if (probabilty < wantedProbability) {
+				lastProbability = probabilty;
+			} else {
+				if (wantedProbability - lastProbability > probabilty - wantedProbability) { // difference from the last probability is greater than this one
+					return x;
+				} else { // else return the last number of customers or zero if x is 0
+					return (x - 1 < 0 ? 0 : x - 1);
+				}
+			}
+		}
+		return maxNumberOfCustomers;
 	}
 
 	/**
@@ -128,7 +151,7 @@ public class Supermarket extends SimState {
 	 */
 	private int getCheckoutTime() {
 		int checkoutTime = (int) Math.round(random.nextGaussian() * checkoutProcessingTime_variance + checkoutProcessingTime_mean);
-
+		// TODO change to normal deviation for X
 		// Checkout time must be positive
 		if (checkoutTime > 0) {
 			return checkoutTime;

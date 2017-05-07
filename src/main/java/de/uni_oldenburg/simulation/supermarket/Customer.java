@@ -13,6 +13,7 @@ import java.awt.*;
 public class Customer extends OvalPortrayal2D implements Steppable {
 
 	public Customer() {
+
 	}
 
 	/**
