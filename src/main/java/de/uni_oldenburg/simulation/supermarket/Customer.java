@@ -12,8 +12,14 @@ import java.awt.*;
  */
 public class Customer extends OvalPortrayal2D implements Steppable {
 
-	public Customer() {
+	private int age;
+	private double stressLevel;
+	private int amountOfAttendant; // TODO hard to implement
 
+	public Customer(int age, double stressLevel, int amountOfAttendant) {
+		this.age = age;
+		this.stressLevel = stressLevel;
+		this.amountOfAttendant = amountOfAttendant;
 	}
 
 	/**
@@ -37,7 +43,9 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 
 			// Step forward or to next free place to the left if possible (but no self checkout)
 			for (int i = 0; i < Supermarket.GRID_WIDTH; i++) {
-				if (objectsAtNextLocation[i] == null && location.y != Supermarket.CHECKOUT_POSITION_Y) {
+				int shortesQueue = supermarket.getShortestQueue();
+				System.out.println(shortesQueue);
+				if (objectsAtNextLocation[i] == null && location.y != Supermarket.CHECKOUT_POSITION_Y && (location.x + i) % Supermarket.GRID_WIDTH == shortesQueue /* all at the shortest queue */) {
 					// TODO take other params into account
 					supermarket.customerGrid.setObjectLocation(this, (location.x + i) % Supermarket.GRID_WIDTH, location.y + 1);
 				}
@@ -62,5 +70,29 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 		int width = (int) (info.draw.width);
 		int height = (int) (info.draw.height);
 		graphics.fillOval(x, y, width, height);
+	}
+
+	/**
+	 * Computes the customers age normal deviated given by the mean and variance passed
+	 * @param mean age of the customers
+	 * @param variance of the normal distribution for the customers age
+	 * @return the normal deviated age
+	 */
+	public static int computeAgeNormalDeviated(double mean, double variance) {
+		double wantedProbability = Math.random(); // between 0 and 1
+		int maxNumberOfX = 100; // this is actually not a max age but a highly unlikely age for customers
+		return Auxiliary.solveNormalDeviationForX(mean, variance, wantedProbability, maxNumberOfX);
+	}
+
+	/**
+	 * Computes the customers stress level normal deviated given by the mean and vairance passed
+	 * @param mean stress level of the customers
+	 * @param variance of the normal distribution of the customers stress level
+	 * @return the normal deviated stress level
+	 */
+	public static double computeStressLevelNormalDeviated(double mean, double variance) {
+		double wantedProbability = Math.random(); // between 0 and 1
+		int maxNumberOfX = 10; // this is actually not a max stressLevel but a highly unlikely stressLevel for customers
+		return Auxiliary.solveNormalDeviationForX(mean, variance, wantedProbability, maxNumberOfX);
 	}
 }
