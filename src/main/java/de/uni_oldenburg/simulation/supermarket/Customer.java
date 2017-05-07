@@ -29,11 +29,11 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 		if (location != null) {
 
 			// Look forward
-			Bag objectsAtNextLocation = supermarket.customerGrid.getObjectsAtLocation(0, location.y + 1);
+			Bag objectsAtNextLocation = supermarket.customerGrid.getObjectsAtLocation(location.x, location.y + 1); // TODO switch x location if checkout is overfilled
 
 			// Step forward if possible (but no self checkout)
-			if (objectsAtNextLocation == null && location.y != supermarket.CHECKOUT_POSITION) {
-				supermarket.customerGrid.setObjectLocation(this, 0, location.y + 1);
+			if (objectsAtNextLocation == null && location.y != supermarket.CHECKOUT_POSITION_Y) {
+				supermarket.customerGrid.setObjectLocation(this, location.x, location.y + 1); // TODO switch x location if checkout is overfilled
 			}
 		}
 	}
