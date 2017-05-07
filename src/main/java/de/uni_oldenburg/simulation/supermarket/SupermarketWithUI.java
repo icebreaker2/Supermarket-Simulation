@@ -109,7 +109,7 @@ public class SupermarketWithUI extends GUIState {
 		super.init(controller);
 
 		// Make the Display2D. We'll have it display stuff later.
-		display = new Display2D(10, 510, this); // At 10x510, we've got 10x10 per array position
+		display = new Display2D(40, 510, this); // At 10x510, we've got 10x10 per array position
 		displayFrame = display.createFrame();
 		controller.registerFrame(displayFrame);   // Register the frame so it appears in the "Display" list
 		displayFrame.setVisible(true);

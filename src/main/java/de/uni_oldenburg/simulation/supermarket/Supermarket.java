@@ -8,9 +8,6 @@ import sim.field.grid.*;
  */
 public class Supermarket extends SimState {
 
-	// set amount of checkouts
-	private final int checkoutAmount = 4;
-
 	// set y locations for checkout and spawn point of the customers
 	public static final int SPAWN_POSITION_Y = 0;
 	public static final int CHECKOUT_POSITION_Y = 49;
@@ -60,7 +57,7 @@ public class Supermarket extends SimState {
 		customerGrid = new SparseGrid2D(GRID_WIDTH, GRID_HEIGHT);
 
 		// Draw supermarketMap
-		for(int i = 0; i < GRID_WIDTH; i++) {
+		for (int i = 0; i < GRID_WIDTH; i++) {
 			supermarketMap.field[i][SPAWN_POSITION_Y] = SPAWN_POINT_ID;
 			supermarketMap.field[i][CHECKOUT_POSITION_Y] = CHECKOUT_POINT_ID;
 		}
@@ -69,15 +66,16 @@ public class Supermarket extends SimState {
 		schedule.scheduleRepeating(Schedule.EPOCH, 1, (Steppable) (SimState state) -> {
 
 			// Synchronize customer spawn with checkout queue
-			if (schedule.getSteps() % Math.round(Math.sqrt(checkoutProcessingTime_mean)) == 0) {
-
-				// Add new customers randomly
-				if (newCustomerArrived()) {
-					Customer customer = new Customer();
-					totalCustomersAmount++;
-					int [] spawnLocation = createSpawnLocation(); // x,y coordinates
-					customerGrid.setObjectLocation(customer, spawnLocation[0], spawnLocation[1]);
-					schedule.scheduleRepeating(customer, 1);
+			for (int i = 0; i < GRID_WIDTH; i++) {
+				if (schedule.getSteps() % Math.round(Math.sqrt(checkoutProcessingTime_mean)) == i) {
+					// Add new customers randomly
+					if (newCustomerArrived()) {
+						Customer customer = new Customer();
+						totalCustomersAmount++;
+						int[] spawnLocation = createSpawnLocation(); // x,y coordinates
+						customerGrid.setObjectLocation(customer, spawnLocation[0], spawnLocation[1]);
+						schedule.scheduleRepeating(customer, 1);
+					}
 				}
 			}
 		}, 1);
@@ -86,7 +84,7 @@ public class Supermarket extends SimState {
 		schedule.scheduleRepeating(Schedule.EPOCH, 1, (Steppable) (SimState state) -> {
 
 			// New customer arrived at checkout
-			for(int i = 0; i < GRID_WIDTH; i++) {
+			for (int i = 0; i < GRID_WIDTH; i++) {
 				if (customerGrid.getObjectsAtLocation(i, CHECKOUT_POSITION_Y) != null) {
 					Customer customer = (Customer) customerGrid.getObjectsAtLocation(i, CHECKOUT_POSITION_Y).get(0);
 					if (customer != customerAtCheckout) {
@@ -102,10 +100,11 @@ public class Supermarket extends SimState {
 
 	/**
 	 * Randomly chooses a spawn location for any new customer.
+	 *
 	 * @return x and y coordinates of the customers spawn point
 	 */
 	private int[] createSpawnLocation() {
-		return new int[]{(int)(random.nextDouble() % checkoutAmount), (int)(random.nextDouble() % checkoutAmount)};
+		return new int[]{(int) (random.nextDouble() * GRID_WIDTH % GRID_WIDTH), (int) (random.nextDouble() * GRID_WIDTH % GRID_WIDTH)};
 	}
 
 	/**
@@ -115,7 +114,7 @@ public class Supermarket extends SimState {
 	 * @return new customer to be added
 	 */
 	private boolean newCustomerArrived() {
-		if (checkoutCustomersAmount_mean-checkoutCustomersAmount_variance > random.nextGaussian()*checkoutCustomersAmount_variance+getNumberOfWaitingCustomers()) {
+		if (checkoutCustomersAmount_mean - checkoutCustomersAmount_variance > random.nextGaussian() * checkoutCustomersAmount_variance + getNumberOfWaitingCustomers()) {
 			return true;
 		} else {
 			return false;
@@ -128,7 +127,7 @@ public class Supermarket extends SimState {
 	 * @return Random time a customer needs for checkout
 	 */
 	private int getCheckoutTime() {
-		int checkoutTime = (int) Math.round(random.nextGaussian()*checkoutProcessingTime_variance+checkoutProcessingTime_mean);
+		int checkoutTime = (int) Math.round(random.nextGaussian() * checkoutProcessingTime_variance + checkoutProcessingTime_mean);
 
 		// Checkout time must be positive
 		if (checkoutTime > 0) {
