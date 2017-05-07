@@ -20,59 +20,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.beanshell</groupId>
-            <artifactId>bsh</artifactId>
-            <version>2.0b4</version>
-        </dependency>
-        <dependency>
             <groupId>fr.irit.smac.thirdparty.edu.gmu.cs</groupId>
             <artifactId>mason</artifactId>
             <version>18</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>itextpdf</artifactId>
-            <version>5.5.11</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scijava</groupId>
-            <artifactId>j3dcore</artifactId>
-            <version>1.6.0-scijava-2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scijava</groupId>
-            <artifactId>j3dutils</artifactId>
-            <version>1.6.0-scijava-2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jfree</groupId>
-            <artifactId>jcommon</artifactId>
-            <version>1.0.24</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jfree</groupId>
-            <artifactId>jfreechart</artifactId>
-            <version>1.0.19</version>
-        </dependency>
-        <dependency>
-            <groupId>jmf</groupId>
-            <artifactId>jmf</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/libs/jmf.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>portfolio</groupId>
-            <artifactId>portfolio</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/libs/portfolio.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>javax.vecmath</groupId>
-            <artifactId>vecmath</artifactId>
-            <version>1.5.2</version>
         </dependency>
     </dependencies>
 
