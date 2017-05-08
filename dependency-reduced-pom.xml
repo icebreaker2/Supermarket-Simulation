@@ -26,7 +26,7 @@
             <index>true</index>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>de.uni_oldenburg.simulation.supermarket.Main</mainClass>
+              <mainClass>de.uni_oldenburg.simulation.supermarket.AppStarter</mainClass>
             </manifest>
           </archive>
         </configuration>
@@ -69,13 +69,6 @@
       <artifactId>mockito-all</artifactId>
       <version>1.10.19</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>portfolio</groupId>
-      <artifactId>portfolio</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/libs/portfolio.jar</systemPath>
     </dependency>
   </dependencies>
   <properties>
