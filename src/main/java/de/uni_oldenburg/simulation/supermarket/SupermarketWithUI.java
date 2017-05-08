@@ -20,13 +20,6 @@ public class SupermarketWithUI extends GUIState {
 	private SparseGridPortrayal2D customersPortrayal = new SparseGridPortrayal2D();
 
 	/**
-	 * Enter the program here
- 	 */
-	public static void main(String[] args) {
-		new SupermarketWithUI().createController();
-	}
-
-	/**
 	 * Start the Simulation at time 0
 	 */
 	public SupermarketWithUI() {

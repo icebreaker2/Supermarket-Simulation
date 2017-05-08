@@ -68,7 +68,7 @@
                     <archive>
                         <index>true</index>
                         <manifest>
-                            <mainClass>de.uni_oldenburg.simulation.supermarket.SupermarketWithUI</mainClass>
+                            <mainClass>de.uni_oldenburg.simulation.supermarket.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
