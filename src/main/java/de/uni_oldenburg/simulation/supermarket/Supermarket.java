@@ -116,6 +116,7 @@ public class Supermarket extends SimState {
 	 * @return Random time a customer needs for checkout
 	 */
 	private int getCheckoutTime() {
+		// TODO take customers properties into account
 		return (int) (this.random.nextGaussian() * checkoutProcessingTime_variance + checkoutProcessingTime_mean); // no negative numbers possible
 	}
 

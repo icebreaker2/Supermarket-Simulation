@@ -44,20 +44,15 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 
 			// Step forward or to next free place to the left if possible (but no self checkout)
 			if (location.y != Supermarket.CHECKOUT_POSITION_Y) {
-				for (int i = 0; i < Supermarket.GRID_WIDTH; i++) {
-					int shortesQueue = supermarket.getShortestQueue();
-					boolean isWillingToSwitchQueue = computeWillingness(supermarket, location.x);
-					// TODO take other params into account
-					if (isWillingToSwitchQueue) {
-						if (objectsAtNextLocation[i] == null && (location.x + i) % Supermarket.GRID_WIDTH == shortesQueue /* all at the shortest queue */) {
+				if (objectsAtNextLocation[location.x] == null) { // step forward
+					supermarket.customerGrid.setObjectLocation(this, location.x, location.y + 1);
+				} else { // decide to switch the queue
+					for (int i = 0; i < Supermarket.GRID_WIDTH; i++) {
+						boolean isWillingToSwitchQueue = computeWillingness(supermarket, location.x, (location.x + i) % Supermarket.GRID_WIDTH);
+						if (isWillingToSwitchQueue && objectsAtNextLocation[(location.x + i) % Supermarket.GRID_WIDTH] == null) {
 							supermarket.customerGrid.setObjectLocation(this, (location.x + i) % Supermarket.GRID_WIDTH, location.y + 1);
 						}
-					} else {
-						if (objectsAtNextLocation[location.x] == null) {
-							supermarket.customerGrid.setObjectLocation(this, location.x, location.y + 1);
-						}
 					}
-
 				}
 			}
 		}
@@ -84,25 +79,32 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 	/**
 	 * Computes the willingness of the customer to switch the checkout queue. Takes age and stressLevel into account
 	 *
-	 * @param supermarket is the supermarket of the customer
+	 * @param supermarket      is the supermarket of the customer
 	 * @param currentXLocation is the current x coordinate of the customer
+	 * @param nextXLocation    is the next location to switch at
 	 * @return a boolean value indicating whether the customer is willing to switch to another queue (1) or not (0)
 	 */
-	private boolean computeWillingness(Supermarket supermarket, int currentXLocation) {
-		// TODO improve with another distribution function?!
-		if (age >= supermarket.getCustomersAge_mean()){ // old people are calm
-			if (stressLevel <= supermarket.getCustomersStressLevel_mean() && lovesCashierAtCheckoutX != currentXLocation) {
+	private boolean computeWillingness(Supermarket supermarket, int currentXLocation, int nextXLocation) {
+		int shortesQueue = supermarket.getShortestQueue();
+		if (age >= supermarket.getCustomersAge_mean()) { // old people are calm
+			if (stressLevel <= supermarket.getCustomersStressLevel_mean() && lovesCashierAtCheckoutX == currentXLocation) {
 				return false;
-			} else if (lovesCashierAtCheckoutX == currentXLocation) {
+			} else if (lovesCashierAtCheckoutX == nextXLocation) {
 				return (new MersenneTwisterFast().nextDouble() >= 0.5); // throw dice to decide, old people do not need love by all means
+			} else {
+				return nextXLocation == shortesQueue; // else all go to the shortest one
 			}
 		} else { // do not hesitate
 			if (lovesCashierAtCheckoutX == currentXLocation) {
 				return false;
-			} else
-				return !(stressLevel <= supermarket.getCustomersStressLevel_mean() && lovesCashierAtCheckoutX != currentXLocation);
+			} else if (stressLevel > supermarket.getCustomersStressLevel_mean()) {
+				return true;
+			} else if (lovesCashierAtCheckoutX == nextXLocation) {
+				return true;
+			} else {
+				return nextXLocation == shortesQueue; // else all go to the shortest one
+			}
 		}
-		return true; // default
 	}
 
 	/**

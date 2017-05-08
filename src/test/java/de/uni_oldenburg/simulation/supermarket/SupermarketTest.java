@@ -14,7 +14,6 @@ public class SupermarketTest {
 
 	@Before
 	public void setUp() {
-		new SupermarketWithUI().createController();
 		supermarket = new Supermarket(0);
 	}
 
