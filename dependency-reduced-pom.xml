@@ -70,6 +70,13 @@
       <version>1.10.19</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>portfolio</groupId>
+      <artifactId>portfolio</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/libs/portfolio.jar</systemPath>
+    </dependency>
   </dependencies>
   <properties>
     <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
