@@ -113,11 +113,7 @@ public class Supermarket extends SimState {
 	 * @return new customer to be added
 	 */
 	private boolean newCustomerArrived() {
-		if (checkoutCustomersAmount_mean - checkoutCustomersAmount_variance > random.nextGaussian() * checkoutCustomersAmount_variance + getNumberOfWaitingCustomers()) {
-			return true;
-		} else {
-			return false;
-		}
+		return (checkoutCustomersAmount_mean - checkoutCustomersAmount_variance) * GRID_WIDTH > random.nextGaussian() * checkoutCustomersAmount_variance + getNumberOfWaitingCustomers();
 	}
 
 	/**
@@ -126,13 +122,14 @@ public class Supermarket extends SimState {
 	 * @return Random time a customer needs for checkout
 	 */
 	private int getCheckoutTime() {
-		int checkoutTime = (int) Math.round(random.nextGaussian() * checkoutProcessingTime_variance + checkoutProcessingTime_mean);
-		// TODO change to normal deviation for X ?!
+
+
+		int checkoutTime = Auxiliary.solveNormalDeviationForX(checkoutProcessingTime_mean, checkoutProcessingTime_variance, this.random.nextDouble(), (int) checkoutProcessingTime_mean*GRID_WIDTH /*highly unlikely*/);
 		// Checkout time must be positive
 		if (checkoutTime > 0) {
 			return checkoutTime;
 		} else {
-			return 1;
+			return (int) checkoutProcessingTime_mean; // in any other error case the customer needs the mean time to be processed
 		}
 	}
 
