@@ -26,7 +26,6 @@ public class SupermarketWithUI extends GUIState {
 		super(new Supermarket(System.currentTimeMillis()));
 	}
 
-
 	/**
 	 * Start the Simulation with a given state
 	 *
