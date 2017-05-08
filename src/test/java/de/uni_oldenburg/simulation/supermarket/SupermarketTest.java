@@ -6,7 +6,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * Created by adrian-jagusch on 08.05.17.
+ * Tests {@link Supermarket}.
  */
 public class SupermarketTest {
 
@@ -14,6 +14,7 @@ public class SupermarketTest {
 
 	@Before
 	public void setUp() {
+		new SupermarketWithUI().createController();
 		supermarket = new Supermarket(0);
 	}
 

@@ -32,11 +32,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>mason</groupId>
+            <groupId>fr.irit.smac.thirdparty.edu.gmu.cs</groupId>
             <artifactId>mason</artifactId>
-            <version>19</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/libs/mason.19.jar</systemPath>
+            <version>18</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -75,6 +73,18 @@
                         </manifest>
                     </archive>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
