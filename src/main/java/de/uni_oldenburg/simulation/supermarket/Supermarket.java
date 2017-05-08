@@ -62,20 +62,14 @@ public class Supermarket extends SimState {
 		// Dynamically spawn new customers
 		schedule.scheduleRepeating(Schedule.EPOCH, 1, (Steppable) (SimState state) -> {
 
-			double wantedProbability = this.random.nextDouble(true, true);
-			int maxNumberOfX = 100000; // this is actually not a max number of customers but a highly unlikely number of customers
-			int newCustomers = Auxiliary.solveNormalDeviationForX(checkoutCustomersAmount_mean, checkoutCustomersAmount_variance, wantedProbability, maxNumberOfX);
-
-			for (int i = 0; i < newCustomers; i++) {
-				// Add new customers randomly
-				if (newCustomerArrived()) {
-					// set customers properties and the customer itself
-					Customer customer = new Customer(Customer.computeAgeNormalDeviated(customersAge_mean, customersAge_variance), Customer.computeStressLevelNormalDeviated(customersStressLevel_mean, customersStressLevel_variance), Customer.computelovesCashierAtCheckoutXNormalDeviated(customersLovesCashierAtCheckoutX_mean, customersLovesCashierAtCheckoutX_variance));
-					totalCustomersAmount++;
-					int[] spawnLocation = createSpawnLocation(); // x,y coordinates
-					customerGrid.setObjectLocation(customer, spawnLocation[0], spawnLocation[1]);
-					schedule.scheduleRepeating(customer, 1);
-				}
+			// Add new customers randomly
+			if (newCustomerArrived()) {
+				// set customers properties and the customer itself
+				Customer customer = new Customer(Customer.computeAgeNormalDeviated(customersAge_mean, customersAge_variance), Customer.computeStressLevelNormalDeviated(customersStressLevel_mean, customersStressLevel_variance), Customer.computelovesCashierAtCheckoutXNormalDeviated(customersLovesCashierAtCheckoutX_mean, customersLovesCashierAtCheckoutX_variance));
+				totalCustomersAmount++;
+				int[] spawnLocation = createSpawnLocation(); // x,y coordinates
+				customerGrid.setObjectLocation(customer, spawnLocation[0], spawnLocation[1]);
+				schedule.scheduleRepeating(customer, 1);
 			}
 		}, 1);
 
@@ -113,7 +107,7 @@ public class Supermarket extends SimState {
 	 * @return new customer to be added
 	 */
 	private boolean newCustomerArrived() {
-		return (checkoutCustomersAmount_mean - checkoutCustomersAmount_variance) * GRID_WIDTH > random.nextGaussian() * checkoutCustomersAmount_variance + getNumberOfWaitingCustomers();
+		return (checkoutCustomersAmount_mean* GRID_WIDTH - checkoutCustomersAmount_variance-1)  > random.nextGaussian() * checkoutCustomersAmount_variance + getNumberOfWaitingCustomers();
 	}
 
 	/**
@@ -122,19 +116,12 @@ public class Supermarket extends SimState {
 	 * @return Random time a customer needs for checkout
 	 */
 	private int getCheckoutTime() {
-
-
-		int checkoutTime = Auxiliary.solveNormalDeviationForX(checkoutProcessingTime_mean, checkoutProcessingTime_variance, this.random.nextDouble(), (int) checkoutProcessingTime_mean*GRID_WIDTH /*highly unlikely*/);
-		// Checkout time must be positive
-		if (checkoutTime > 0) {
-			return checkoutTime;
-		} else {
-			return (int) checkoutProcessingTime_mean; // in any other error case the customer needs the mean time to be processed
-		}
+		return (int) (this.random.nextGaussian() * checkoutProcessingTime_variance + checkoutProcessingTime_mean); // no negative numbers possible
 	}
 
 	/**
 	 * Computes the shortest queue of all and return its x coordinate
+	 *
 	 * @return the x coordinate of the shortest queue or -1 in case of any error
 	 */
 	public int getShortestQueue() {

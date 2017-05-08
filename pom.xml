@@ -32,9 +32,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>fr.irit.smac.thirdparty.edu.gmu.cs</groupId>
+            <groupId>mason</groupId>
             <artifactId>mason</artifactId>
-            <version>18</version>
+            <version>19</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/libs/mason.19.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

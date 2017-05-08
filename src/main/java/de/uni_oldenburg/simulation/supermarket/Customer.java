@@ -113,9 +113,7 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 	 * @return the normal deviated age
 	 */
 	public static int computeAgeNormalDeviated(double mean, double variance) {
-		double wantedProbability = Math.random(); // between 0 and 1
-		int maxNumberOfX = 100; // this is actually not a max age but a highly unlikely age for customers
-		return Auxiliary.solveNormalDeviationForX(mean, variance, wantedProbability, maxNumberOfX);
+		return (int) (new MersenneTwisterFast().nextGaussian() * variance + mean); // no negative numbers possible
 	}
 
 	/**
@@ -126,9 +124,7 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 	 * @return the normal deviated stress level
 	 */
 	public static double computeStressLevelNormalDeviated(double mean, double variance) {
-		double wantedProbability = Math.random(); // between 0 and 1
-		int maxNumberOfX = 10; // this is actually not a max stressLevel but a highly unlikely stressLevel for customers
-		return Auxiliary.solveNormalDeviationForX(mean, variance, wantedProbability, maxNumberOfX);
+		return (int) (new MersenneTwisterFast().nextGaussian() * variance + mean); // no negative numbers possible
 	}
 
 	/**
@@ -139,9 +135,6 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 	 * @return the normal deviated cashier the customers fell in love with
 	 */
 	public static int computelovesCashierAtCheckoutXNormalDeviated(double mean, double variance) {
-
-		double wantedProbability = Math.random(); // between 0 and 1
-		int maxNumberOfX = Supermarket.GRID_WIDTH-1;
-		return Auxiliary.solveNormalDeviationForX(mean, variance, wantedProbability, maxNumberOfX) % Supermarket.GRID_WIDTH /*Prevents wrong params */;
+		return (int) (new MersenneTwisterFast().nextGaussian() * variance + mean) % Supermarket.GRID_WIDTH; // no negative numbers possible
 	}
 }
