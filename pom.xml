@@ -18,16 +18,9 @@
         <java.version.target>${java.version}</java.version.target>
     </properties>
 
-    <!-- remote repositories  (mainly needed for jmf and portfolio) -->
-    <repositories>
-        <repository>
-            <id>Collide</id>
-            <url>http://mvn.collide.info/content/repositories/releases/</url>
-        </repository>
-    </repositories>
-
     <dependencies>
-        <!-- jUnit testing -->
+        <!-- jUnit test
+        ing -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -46,7 +39,7 @@
             <version>RELEASE</version>
         </dependency>
 
-        <!-- MASON and its dependencies. See http://cs.gmu.edu/~eclab/projects/mason/ for further information about the dependencies of MASON -->
+        <!-- MASON -->
         <dependency>
             <groupId>fr.irit.smac.thirdparty.edu.gmu.cs</groupId>
             <artifactId>mason</artifactId>
