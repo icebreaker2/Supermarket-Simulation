@@ -19,8 +19,7 @@
     </properties>
 
     <dependencies>
-        <!-- jUnit test
-        ing -->
+        <!-- jUnit testing -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
