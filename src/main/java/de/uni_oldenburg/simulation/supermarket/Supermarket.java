@@ -1,5 +1,8 @@
 package de.uni_oldenburg.simulation.supermarket;
 
+import de.uni_oldenburg.simulation.supermarket.customers.Customer;
+import de.uni_oldenburg.simulation.supermarket.customers.OnlyGoForwardCustomer;
+import de.uni_oldenburg.simulation.supermarket.customers.RandomStrategyCustomer;
 import sim.engine.*;
 import sim.field.grid.*;
 
@@ -17,11 +20,11 @@ public class Supermarket extends SimState {
 	public static final int CHECKOUT_POINT_ID = 2;
 
 	// some initial properties
+	private int customerStrategy = 3;
 	private double checkoutCustomersAmount_mean = 12.0;
 	private double checkoutCustomersAmount_variance = 4.0;
 	private double checkoutProcessingTime_mean = 30.0;
 	private double checkoutProcessingTime_variance = 5.0;
-
 	private double customerInfirm_probability = 0.1;
 	private double customerStressed_probability = 0.2;
 	private double customerPrefersCheckoutOne_probability = 0.25;
@@ -65,7 +68,16 @@ public class Supermarket extends SimState {
 			for (int i = 0; i < GRID_WIDTH; i++) {
 				// Generate new customers randomly
 				if (newCustomerArrived()) {
-					newCustomers[i] = new Customer(this);
+					switch (customerStrategy) {
+						case 1: newCustomers[i] = new OnlyGoForwardCustomer(this);
+							break;
+
+						case 2: newCustomers[i] = new RandomStrategyCustomer(this);
+							break;
+
+						case 3: newCustomers[i] = new RandomStrategyCustomer(this);
+							break;
+					}
 				}
 			}
 
@@ -105,6 +117,20 @@ public class Supermarket extends SimState {
 	 */
 	private boolean newCustomerArrived() {
 		return (checkoutCustomersAmount_mean*GRID_WIDTH - checkoutCustomersAmount_variance)  > random.nextGaussian() * checkoutCustomersAmount_variance + getNumberOfWaitingCustomers();
+	}
+
+	/**
+	 * @return The strategy used by new customers
+	 */
+	public int getCustomerStrategy() {
+		return customerStrategy;
+	}
+
+	/**
+	 * @param customerStrategy The strategy used by new customers
+	 */
+	public void setCustomerStrategy(int customerStrategy) {
+		this.customerStrategy = customerStrategy;
 	}
 
 	/**

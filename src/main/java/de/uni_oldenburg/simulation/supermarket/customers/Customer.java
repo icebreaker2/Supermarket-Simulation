@@ -1,6 +1,6 @@
-package de.uni_oldenburg.simulation.supermarket;
+package de.uni_oldenburg.simulation.supermarket.customers;
 
-import ec.util.MersenneTwisterFast;
+import de.uni_oldenburg.simulation.supermarket.Supermarket;
 import sim.portrayal.*;
 import sim.portrayal.simple.*;
 import sim.util.*;
@@ -11,14 +11,15 @@ import java.awt.*;
 /**
  * This is our model for a single customer (agent) waiting in the supermarket queue
  */
-public class Customer extends OvalPortrayal2D implements Steppable {
+public abstract class Customer extends OvalPortrayal2D implements Steppable, DistributionStrategy {
 
 	// Characteristics
 	private boolean infirm;
 	private boolean stressed;
 	private boolean prefersCheckoutOne;
 
-	private Supermarket supermarket;
+	public Supermarket supermarket;
+	public Int2D location;
 
 	public Customer(Supermarket supermarket) {
 		this.supermarket = supermarket;
@@ -36,40 +37,15 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 	 */
 	public void step(final SimState state) {
 
-		Int2D location = supermarket.customerGrid.getObjectLocation(this);
+		// Update location
+		location = supermarket.customerGrid.getObjectLocation(this);
 
 		// Customer still in the supermarket?
 		if (location != null) {
 
-			// Look forward
-			Bag objectsAtNextLocation = supermarket.customerGrid.getObjectsAtLocation(location.x, location.y + 1);
-
 			// No self checkout
 			if (location.y != supermarket.CHECKOUT_POSITION_Y) {
-
-				// Step forward whenever possible
-				if (objectsAtNextLocation == null) {
-					supermarket.customerGrid.setObjectLocation(this, location.x, location.y + 1);
-				} else {
-
-					if (wantsToChangeQueue()) {
-
-						// Check sides
-						if (supermarket.random.nextBoolean()) {
-							// Check left
-							Bag objectsAtLeftLocation = supermarket.customerGrid.getObjectsAtLocation(location.x-1, location.y );
-							if (objectsAtLeftLocation == null) {
-								supermarket.customerGrid.setObjectLocation(this, location.x-1, location.y);
-							}
-						} else {
-							// Check right
-							Bag objectsAtRightLocation = supermarket.customerGrid.getObjectsAtLocation(location.x+1, location.y );
-							if (objectsAtRightLocation == null) {
-								supermarket.customerGrid.setObjectLocation(this, location.x+1, location.y );
-							}
-						}
-					}
-				}
+				executeStrategyStep();
 			}
 		}
 	}
@@ -111,7 +87,7 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 	 *
 	 * @return a boolean value indicating whether the customer is willing to switch to another queue (1) or not (0)
 	 */
-	private boolean wantsToChangeQueue() {
+	public boolean wantsToChangeQueue() {
 
 		Int2D location = supermarket.customerGrid.getObjectLocation(this);
 		boolean isWaitingAtCheckoutOne = (location.x == 0);
