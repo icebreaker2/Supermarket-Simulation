@@ -6,7 +6,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * Tests {@link Supermarket}.
+ * Test {@link Supermarket}.
  */
 public class SupermarketTest {
 

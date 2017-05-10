@@ -1,13 +1,10 @@
 # MASON Supermarket Simulation
 
-This is a simulation of a supermarket checkout with the MASON framework.
+This is a simulation of four supermarket checkouts with the MASON framework.
 
 # Building
-* Open in your favorite IDE
-* Set source folder (src/main/java/)
-* Set library folder (libs/)
-* Set target folder (e.g. target/)
-* Run SupermarketWithUI's main method
+* Build with Maven: ```mvn install```
+* Run executable jar: ```target/supermarket-2.0-with-dependencies.jar```
 
 __ENJOY!__
 
