@@ -17,6 +17,7 @@ public abstract class Customer extends OvalPortrayal2D implements Steppable, Dis
 	private boolean infirm;
 	private boolean stressed;
 	private boolean prefersCheckoutOne;
+	public String name;
 
 	public Supermarket supermarket;
 	public Int2D location;

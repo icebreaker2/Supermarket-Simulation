@@ -8,6 +8,8 @@ import sim.util.Bag;
  */
 public class OnlyGoForwardCustomer extends Customer {
 
+	public String name = "OnlyGoForward";
+
 	/**
 	 * Constructor
 	 * @param supermarket

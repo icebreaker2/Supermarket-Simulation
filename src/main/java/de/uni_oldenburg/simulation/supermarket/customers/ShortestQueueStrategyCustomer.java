@@ -8,6 +8,8 @@ import sim.util.Bag;
  */
 public class ShortestQueueStrategyCustomer extends Customer {
 
+	public String name = "ShortestQueue";
+
 	public ShortestQueueStrategyCustomer(Supermarket supermarket) {
 		super(supermarket);
 	}
