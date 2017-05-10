@@ -1,10 +1,12 @@
 package de.uni_oldenburg.simulation.supermarket.customers;
 
+import de.uni_oldenburg.simulation.supermarket.Supermarket;
+
 /**
- * Created by adrian-jagusch on 10.05.17.
+ * Interface for a distribution strategy
  */
 public interface DistributionStrategy {
 
-	public void executeStrategyStep();
+	public void executeStrategyStep(Supermarket simstep);
 
 }

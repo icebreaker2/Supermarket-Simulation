@@ -19,7 +19,8 @@ public class OnlyGoForwardCustomer extends Customer {
 	/**
 	 * The basic customer only goes forward whenever possible
 	 */
-	public void executeStrategyStep() {
+	@Override
+	public void executeStrategyStep(Supermarket supermarket) {
 
 		// Look forward
 		Bag objectsAtNextLocation = supermarket.customerGrid.getObjectsAtLocation(location.x, location.y + 1);

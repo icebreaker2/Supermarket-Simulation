@@ -37,6 +37,8 @@ public abstract class Customer extends OvalPortrayal2D implements Steppable, Dis
 	 */
 	public void step(final SimState state) {
 
+		Supermarket supermarket = (Supermarket) state;
+
 		// Update location
 		location = supermarket.customerGrid.getObjectLocation(this);
 
@@ -45,7 +47,7 @@ public abstract class Customer extends OvalPortrayal2D implements Steppable, Dis
 
 			// No self checkout
 			if (location.y != supermarket.CHECKOUT_POSITION_Y) {
-				executeStrategyStep();
+				executeStrategyStep(supermarket);
 			}
 		}
 	}
