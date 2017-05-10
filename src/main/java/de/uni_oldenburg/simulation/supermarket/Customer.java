@@ -75,6 +75,20 @@ public class Customer extends OvalPortrayal2D implements Steppable {
 	}
 
 	/**
+	 * Get random checkout time with given mean, variance and characteristics
+	 *
+	 * @return Random time a customer needs for checkout
+	 */
+	public int getCheckoutTime() {
+
+		int timeBonus = 0;
+		if (infirm) timeBonus = 10; // Infirm people are slower
+
+		// no negative numbers allowed
+		return (int) Math.max(Math.round(supermarket.random.nextGaussian() * supermarket.getCheckoutProcessingTime_variance() + supermarket.getCheckoutProcessingTime_mean() + timeBonus), 0);
+	}
+
+	/**
 	 * Draw the customer
 	 *
 	 * @param object   The customer

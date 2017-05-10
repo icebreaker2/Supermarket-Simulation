@@ -87,7 +87,7 @@ public class Supermarket extends SimState {
 				if (customerGrid.getObjectsAtLocation(i, CHECKOUT_POSITION_Y) != null) {
 					Customer customer = (Customer) customerGrid.getObjectsAtLocation(i, CHECKOUT_POSITION_Y).get(0);
 					if (customer != customersAtCheckout[i]) {
-						schedule.scheduleOnceIn(getCheckoutTime(), (Steppable) (SimState leaveState) -> {
+						schedule.scheduleOnceIn(customer.getCheckoutTime(), (Steppable) (SimState leaveState) -> {
 							customerGrid.remove(customer);
 						});
 						customersAtCheckout[i] = customer;
@@ -105,16 +105,6 @@ public class Supermarket extends SimState {
 	 */
 	private boolean newCustomerArrived() {
 		return (checkoutCustomersAmount_mean*GRID_WIDTH - checkoutCustomersAmount_variance)  > random.nextGaussian() * checkoutCustomersAmount_variance + getNumberOfWaitingCustomers();
-	}
-
-	/**
-	 * Get random checkout time with given mean and variance
-	 *
-	 * @return Random time a customer needs for checkout
-	 */
-	private int getCheckoutTime() {
-		// TODO take customers properties into account
-		return (int) Math.max(Math.round(random.nextGaussian() * checkoutProcessingTime_variance + checkoutProcessingTime_mean), 0); // no negative numbers possible
 	}
 
 	/**
