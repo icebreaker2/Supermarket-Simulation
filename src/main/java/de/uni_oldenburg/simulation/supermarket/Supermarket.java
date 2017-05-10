@@ -26,8 +26,8 @@ public class Supermarket extends SimState {
 	private double checkoutCustomersAmount_variance = 4.0;
 	private double checkoutProcessingTime_mean = 30.0;
 	private double checkoutProcessingTime_variance = 5.0;
-	private double customerInfirm_probability = 0.25;
-	private double customerStressed_probability = 0.3;
+	private double customerInfirm_probability = 0.20;
+	private double customerStressed_probability = 0.25;
 	private double customerPrefersCheckoutOne_probability = 0.1;
 
 	private int totalCustomersAmount = 0;
