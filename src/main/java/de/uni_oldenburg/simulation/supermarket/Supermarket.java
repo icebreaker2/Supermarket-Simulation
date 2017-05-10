@@ -22,12 +22,9 @@ public class Supermarket extends SimState {
 	private double checkoutProcessingTime_mean = 30.0;
 	private double checkoutProcessingTime_variance = 5.0;
 
-	private double customersAge_mean = 40.0;
-	private double customersAge_variance = 4.0;
-	private double customersStressLevel_mean = 5.0;
-	private double customersStressLevel_variance = 1.5;
-	private double customersLovesCashierAtCheckoutX_mean = 2; // if set to high the modulus will decrease it
-	private double customersLovesCashierAtCheckoutX_variance = 1.5;
+	private double customerInfirm_probability = 0.1;
+	private double customerStressed_probability = 0.2;
+	private double customerPrefersCheckoutOne_probability = 0.25;
 
 	private int totalCustomersAmount = 0;
 
@@ -37,7 +34,7 @@ public class Supermarket extends SimState {
 	public static final int GRID_HEIGHT = 50;
 	public static final int GRID_WIDTH = 4;
 
-	Customer customerAtCheckout; // Just a reference
+	Customer[] customersAtCheckout = new Customer[GRID_WIDTH]; // Just a reference
 
 	public Supermarket(long seed) {
 		super(seed);
@@ -62,14 +59,23 @@ public class Supermarket extends SimState {
 		// Dynamically spawn new customers
 		schedule.scheduleRepeating(Schedule.EPOCH, 1, (Steppable) (SimState state) -> {
 
-			// Add new customers randomly
-			if (newCustomerArrived()) {
-				// set customers properties and the customer itself
-				Customer customer = new Customer(Customer.computeAgeNormalDeviated(customersAge_mean, customersAge_variance), Customer.computeStressLevelNormalDeviated(customersStressLevel_mean, customersStressLevel_variance), Customer.computelovesCashierAtCheckoutXNormalDeviated(customersLovesCashierAtCheckoutX_mean, customersLovesCashierAtCheckoutX_variance));
-				totalCustomersAmount++;
-				int[] spawnLocation = createSpawnLocation(); // x,y coordinates
-				customerGrid.setObjectLocation(customer, spawnLocation[0], spawnLocation[1]);
-				schedule.scheduleRepeating(customer, 1);
+			Customer[] newCustomers = new Customer[GRID_WIDTH];
+
+			// Customers may arrive at any point
+			for (int i = 0; i < GRID_WIDTH; i++) {
+				// Generate new customers randomly
+				if (newCustomerArrived()) {
+					newCustomers[i] = new Customer(this);
+				}
+			}
+
+			// Set customers into supermarket
+			for (int i = 0; i < GRID_WIDTH; i++) {
+				if (newCustomers[i] != null) {
+					customerGrid.setObjectLocation(newCustomers[i], i, SPAWN_POSITION_Y);
+					schedule.scheduleRepeating(newCustomers[i], 1);
+					totalCustomersAmount++;
+				}
 			}
 		}, 1);
 
@@ -80,24 +86,15 @@ public class Supermarket extends SimState {
 			for (int i = 0; i < GRID_WIDTH; i++) {
 				if (customerGrid.getObjectsAtLocation(i, CHECKOUT_POSITION_Y) != null) {
 					Customer customer = (Customer) customerGrid.getObjectsAtLocation(i, CHECKOUT_POSITION_Y).get(0);
-					if (customer != customerAtCheckout) {
+					if (customer != customersAtCheckout[i]) {
 						schedule.scheduleOnceIn(getCheckoutTime(), (Steppable) (SimState leaveState) -> {
 							customerGrid.remove(customer);
 						});
-						customerAtCheckout = customer;
+						customersAtCheckout[i] = customer;
 					}
 				}
 			}
 		}, 1);
-	}
-
-	/**
-	 * Randomly chooses a spawn location for any new customer.
-	 *
-	 * @return x and y coordinates of the customers spawn point
-	 */
-	private int[] createSpawnLocation() {
-		return new int[]{(int) (random.nextDouble() * GRID_WIDTH % GRID_WIDTH), (int) (random.nextDouble() * GRID_WIDTH % GRID_WIDTH)};
 	}
 
 	/**
@@ -107,7 +104,7 @@ public class Supermarket extends SimState {
 	 * @return new customer to be added
 	 */
 	private boolean newCustomerArrived() {
-		return (checkoutCustomersAmount_mean* GRID_WIDTH - checkoutCustomersAmount_variance-1)  > random.nextGaussian() * checkoutCustomersAmount_variance + getNumberOfWaitingCustomers();
+		return (checkoutCustomersAmount_mean*GRID_WIDTH - checkoutCustomersAmount_variance)  > random.nextGaussian() * checkoutCustomersAmount_variance + getNumberOfWaitingCustomers();
 	}
 
 	/**
@@ -117,73 +114,51 @@ public class Supermarket extends SimState {
 	 */
 	private int getCheckoutTime() {
 		// TODO take customers properties into account
-		return (int) (this.random.nextGaussian() * checkoutProcessingTime_variance + checkoutProcessingTime_mean); // no negative numbers possible
+		return (int) Math.max(Math.round(random.nextGaussian() * checkoutProcessingTime_variance + checkoutProcessingTime_mean), 0); // no negative numbers possible
 	}
 
 	/**
-	 * Computes the shortest queue of all and return its x coordinate
-	 *
-	 * @return the x coordinate of the shortest queue or -1 in case of any error
+	 * @return Probability if a new customer is infirm
 	 */
-	public int getShortestQueue() {
-		int[] queuesAtX = new int[GRID_WIDTH];
-		if (customerGrid != null) {
-			for (int x = 0; x < GRID_WIDTH; x++) {
-				for (int y = GRID_HEIGHT - 1; y >= 0; y--) {
-					if (customerGrid.getObjectsAtLocation(x, y) != null) {
-						queuesAtX[x]++;
-					} else {
-						break; // no more customers in the queue
-					}
-				}
-			}
-			int shortestQueue = (int) Math.min(Math.min(queuesAtX[0], queuesAtX[1]), Math.min(queuesAtX[2], queuesAtX[3]));
-			for (int i = 0; i < GRID_WIDTH; i++) {
-				if (queuesAtX[i] == shortestQueue) return i;
-			}
-		}
-		return -1;
+	public double getCustomerInfirm_probability() {
+		return customerInfirm_probability;
 	}
 
-	public double getCustomersLovesCashierAtCheckoutX_mean() {
-		return customersLovesCashierAtCheckoutX_mean;
+	/**
+	 * @param customerInfirm_probability Probability if a new customer is infirm
+	 */
+	public void setCustomerInfirm_probability(double customerInfirm_probability) {
+		this.customerInfirm_probability = customerInfirm_probability;
 	}
 
-	public void setCustomersLovesCashierAtCheckoutX_mean(double customersLovesCashierAtCheckoutX_mean) {
-		this.customersLovesCashierAtCheckoutX_mean = customersLovesCashierAtCheckoutX_mean;
+	/**
+	 * @return Probability if a new customer is stressed
+	 */
+	public double getCustomerStressed_probability() {
+		return customerStressed_probability;
 	}
 
-	public double getCustomersAge_mean() {
-		return customersAge_mean;
+	/**
+	 * @param customerStressed_probability Probability if a new customer is stressed
+	 */
+	public void setCustomerStressed_probability(double customerStressed_probability) {
+		this.customerStressed_probability = customerStressed_probability;
 	}
 
-	public void setCustomersAge_mean(double customersAge_mean) {
-		this.customersAge_mean = customersAge_mean;
+	/**
+	 * @return Probability if a new customer prefers checkout one (e.g. in love)
+	 */
+	public double getCustomerPrefersCheckoutOne_probability() {
+		return customerPrefersCheckoutOne_probability;
 	}
 
-	public double getCustomersAge_variance() {
-		return customersAge_variance;
+	/**
+	 * @param customerPrefersCheckoutOne_probability Probability if a new customer prefers checkout one (e.g. in love)
+	 */
+	public void setCustomerPrefersCheckoutOne_probability(double customerPrefersCheckoutOne_probability) {
+		this.customerPrefersCheckoutOne_probability = customerPrefersCheckoutOne_probability;
 	}
-
-	public void setCustomersAge_variance(double customersAge_variance) {
-		this.customersAge_variance = customersAge_variance;
-	}
-
-	public double getCustomersStressLevel_mean() {
-		return customersStressLevel_mean;
-	}
-
-	public void setCustomersStressLevel_mean(double customersStressLevel_mean) {
-		this.customersStressLevel_mean = customersStressLevel_mean;
-	}
-
-	public double getCustomersStressLevel_variance() {
-		return customersStressLevel_variance;
-	}
-
-	public void setCustomersStressLevel_variance(double customersStressLevel_variance) {
-		this.customersStressLevel_variance = customersStressLevel_variance;
-	}
+	
 
 	/**
 	 * @return The variance of the queue length
@@ -245,11 +220,15 @@ public class Supermarket extends SimState {
 	 * @return The number of customers in the supermarket
 	 */
 	public int getNumberOfWaitingCustomers() {
-		if (customerGrid != null) {
-			return customerGrid.getAllObjects().size();
-		} else {
-			return 0;
+		int waitingCustomers = 0;
+		for (int x = 0; x < GRID_WIDTH; x++) {
+			for (int y = 0; y < GRID_HEIGHT; y++) {
+				try {
+					if (customerGrid != null & customerGrid.getObjectsAtLocation(x, y) != null) waitingCustomers++;
+				} catch (NullPointerException e) {}
+			}
 		}
+		return waitingCustomers;
 	}
 
 	/**
