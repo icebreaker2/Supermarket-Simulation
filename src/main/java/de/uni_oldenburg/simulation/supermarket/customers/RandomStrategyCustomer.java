@@ -16,48 +16,40 @@ public class RandomStrategyCustomer extends Customer {
 	@Override
 	public void executeStrategyStep(Supermarket supermarket) {
 
-		// Customer still in the supermarket?
-		if (location != null) {
+		// Look forward
+		Bag objectsAtNextLocation = supermarket.customerGrid.getObjectsAtLocation(location.x, location.y + 1);
 
-			// Look forward
-			Bag objectsAtNextLocation = supermarket.customerGrid.getObjectsAtLocation(location.x, location.y + 1);
+		// Step forward whenever possible
+		if (objectsAtNextLocation == null) {
+			supermarket.customerGrid.setObjectLocation(this, location.x, location.y + 1);
+		} else {
 
-			// No self checkout
-			if (location.y != supermarket.CHECKOUT_POSITION_Y) {
+			if (wantsToChangeQueue()) {
 
-				// Step forward whenever possible
-				if (objectsAtNextLocation == null) {
-					supermarket.customerGrid.setObjectLocation(this, location.x, location.y + 1);
+				// Check sides
+				if (location.x == 0) {
+					// Check right
+					Bag objectsAtRightLocation = supermarket.customerGrid.getObjectsAtLocation(location.x+1, location.y );
+					if (objectsAtRightLocation == null) {
+						supermarket.customerGrid.setObjectLocation(this, location.x+1, location.y );
+					}
+				} else if (location.x == supermarket.GRID_WIDTH-1) {
+					// Check left
+					Bag objectsAtLeftLocation = supermarket.customerGrid.getObjectsAtLocation(location.x-1, location.y );
+					if (objectsAtLeftLocation == null) {
+						supermarket.customerGrid.setObjectLocation(this, location.x-1, location.y);
+					}
+				} else if (supermarket.random.nextBoolean()) {
+					// Check left
+					Bag objectsAtLeftLocation = supermarket.customerGrid.getObjectsAtLocation(location.x-1, location.y );
+					if (objectsAtLeftLocation == null) {
+						supermarket.customerGrid.setObjectLocation(this, location.x-1, location.y);
+					}
 				} else {
-
-					if (wantsToChangeQueue()) {
-
-						// Check sides
-						if (location.x == 0) {
-							// Check right
-							Bag objectsAtRightLocation = supermarket.customerGrid.getObjectsAtLocation(location.x+1, location.y );
-							if (objectsAtRightLocation == null) {
-								supermarket.customerGrid.setObjectLocation(this, location.x+1, location.y );
-							}
-						} else if (location.x == supermarket.GRID_WIDTH-1) {
-							// Check left
-							Bag objectsAtLeftLocation = supermarket.customerGrid.getObjectsAtLocation(location.x-1, location.y );
-							if (objectsAtLeftLocation == null) {
-								supermarket.customerGrid.setObjectLocation(this, location.x-1, location.y);
-							}
-						} else if (supermarket.random.nextBoolean()) {
-							// Check left
-							Bag objectsAtLeftLocation = supermarket.customerGrid.getObjectsAtLocation(location.x-1, location.y );
-							if (objectsAtLeftLocation == null) {
-								supermarket.customerGrid.setObjectLocation(this, location.x-1, location.y);
-							}
-						} else {
-							// Check right
-							Bag objectsAtRightLocation = supermarket.customerGrid.getObjectsAtLocation(location.x+1, location.y );
-							if (objectsAtRightLocation == null) {
-								supermarket.customerGrid.setObjectLocation(this, location.x+1, location.y );
-							}
-						}
+					// Check right
+					Bag objectsAtRightLocation = supermarket.customerGrid.getObjectsAtLocation(location.x+1, location.y );
+					if (objectsAtRightLocation == null) {
+						supermarket.customerGrid.setObjectLocation(this, location.x+1, location.y );
 					}
 				}
 			}
