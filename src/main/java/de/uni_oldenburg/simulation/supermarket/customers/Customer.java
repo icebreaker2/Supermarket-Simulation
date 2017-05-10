@@ -37,8 +37,6 @@ public abstract class Customer extends OvalPortrayal2D implements Steppable, Dis
 	 */
 	public void step(final SimState state) {
 
-		Supermarket supermarket = (Supermarket) state;
-
 		// Update location
 		location = supermarket.customerGrid.getObjectLocation(this);
 
@@ -75,7 +73,12 @@ public abstract class Customer extends OvalPortrayal2D implements Steppable, Dis
 	 */
 	public final void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
 
+		// Set customer colors
 		graphics.setColor(Color.black);
+		if (infirm) graphics.setColor(Color.yellow);
+		if (stressed) graphics.setColor(Color.red);
+		if (stressed && infirm) graphics.setColor(Color.orange);
+
 		// this code was stolen from OvalPortrayal2D
 		int x = (int) (info.draw.x - info.draw.width / 2.0);
 		int y = (int) (info.draw.y - info.draw.height / 2.0);
@@ -99,6 +102,6 @@ public abstract class Customer extends OvalPortrayal2D implements Steppable, Dis
 		if (stressed) wantsToChangeScore++;
 		if (!infirm) wantsToChangeScore++;
 
-		return supermarket.random.nextBoolean(wantsToChangeScore/3);
+		return supermarket.random.nextBoolean(Math.min(wantsToChangeScore/2, 1));
 	}
 }

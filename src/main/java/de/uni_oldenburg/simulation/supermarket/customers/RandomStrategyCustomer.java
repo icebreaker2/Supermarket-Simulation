@@ -16,8 +16,6 @@ public class RandomStrategyCustomer extends Customer {
 	@Override
 	public void executeStrategyStep(Supermarket supermarket) {
 
-		Int2D location = supermarket.customerGrid.getObjectLocation(this);
-
 		// Customer still in the supermarket?
 		if (location != null) {
 
@@ -35,7 +33,19 @@ public class RandomStrategyCustomer extends Customer {
 					if (wantsToChangeQueue()) {
 
 						// Check sides
-						if (supermarket.random.nextBoolean()) {
+						if (location.x == 0) {
+							// Check right
+							Bag objectsAtRightLocation = supermarket.customerGrid.getObjectsAtLocation(location.x+1, location.y );
+							if (objectsAtRightLocation == null) {
+								supermarket.customerGrid.setObjectLocation(this, location.x+1, location.y );
+							}
+						} else if (location.x == supermarket.GRID_WIDTH-1) {
+							// Check left
+							Bag objectsAtLeftLocation = supermarket.customerGrid.getObjectsAtLocation(location.x-1, location.y );
+							if (objectsAtLeftLocation == null) {
+								supermarket.customerGrid.setObjectLocation(this, location.x-1, location.y);
+							}
+						} else if (supermarket.random.nextBoolean()) {
 							// Check left
 							Bag objectsAtLeftLocation = supermarket.customerGrid.getObjectsAtLocation(location.x-1, location.y );
 							if (objectsAtLeftLocation == null) {

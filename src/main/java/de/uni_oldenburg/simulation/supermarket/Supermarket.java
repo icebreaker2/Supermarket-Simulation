@@ -25,9 +25,9 @@ public class Supermarket extends SimState {
 	private double checkoutCustomersAmount_variance = 4.0;
 	private double checkoutProcessingTime_mean = 30.0;
 	private double checkoutProcessingTime_variance = 5.0;
-	private double customerInfirm_probability = 0.1;
-	private double customerStressed_probability = 0.2;
-	private double customerPrefersCheckoutOne_probability = 0.25;
+	private double customerInfirm_probability = 0.25;
+	private double customerStressed_probability = 0.3;
+	private double customerPrefersCheckoutOne_probability = 0.1;
 
 	private int totalCustomersAmount = 0;
 
@@ -144,7 +144,13 @@ public class Supermarket extends SimState {
 	 * @param customerInfirm_probability Probability if a new customer is infirm
 	 */
 	public void setCustomerInfirm_probability(double customerInfirm_probability) {
-		this.customerInfirm_probability = customerInfirm_probability;
+		if (customerInfirm_probability > 1) {
+			this.customerInfirm_probability = 1;
+		} else if (customerInfirm_probability < 0) {
+			this.customerInfirm_probability = 0;
+		} else {
+			this.customerInfirm_probability = customerInfirm_probability;
+		}
 	}
 
 	/**
@@ -158,7 +164,13 @@ public class Supermarket extends SimState {
 	 * @param customerStressed_probability Probability if a new customer is stressed
 	 */
 	public void setCustomerStressed_probability(double customerStressed_probability) {
-		this.customerStressed_probability = customerStressed_probability;
+		if (customerStressed_probability > 1) {
+			this.customerStressed_probability = 1;
+		} else if (customerStressed_probability < 0) {
+			this.customerStressed_probability = 0;
+		} else {
+			this.customerStressed_probability = customerStressed_probability;
+		}
 	}
 
 	/**
@@ -172,9 +184,14 @@ public class Supermarket extends SimState {
 	 * @param customerPrefersCheckoutOne_probability Probability if a new customer prefers checkout one (e.g. in love)
 	 */
 	public void setCustomerPrefersCheckoutOne_probability(double customerPrefersCheckoutOne_probability) {
-		this.customerPrefersCheckoutOne_probability = customerPrefersCheckoutOne_probability;
+		if (customerPrefersCheckoutOne_probability > 1) {
+			this.customerPrefersCheckoutOne_probability = 1;
+		} else if (customerPrefersCheckoutOne_probability < 0) {
+			this.customerPrefersCheckoutOne_probability = 0;
+		} else {
+			this.customerPrefersCheckoutOne_probability = customerPrefersCheckoutOne_probability;
+		}
 	}
-	
 
 	/**
 	 * @return The variance of the queue length
