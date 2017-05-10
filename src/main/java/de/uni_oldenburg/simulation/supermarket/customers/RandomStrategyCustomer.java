@@ -9,6 +9,8 @@ import sim.util.Int2D;
  */
 public class RandomStrategyCustomer extends Customer {
 
+	public String name = "Random";
+
 	public RandomStrategyCustomer(Supermarket supermarket) {
 		super(supermarket);
 	}

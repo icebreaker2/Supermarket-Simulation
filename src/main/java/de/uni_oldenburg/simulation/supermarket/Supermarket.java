@@ -50,6 +50,8 @@ public class Supermarket extends SimState {
 	public void start() {
 		super.start();  // clear out the schedule
 
+		// TODO add your arff writer (initilize) here
+
 		// Initialize grids
 		customerGrid = new SparseGrid2D(GRID_WIDTH, GRID_HEIGHT);
 		supermarketMap = new IntGrid2D(GRID_WIDTH, GRID_HEIGHT, 0);
@@ -99,6 +101,20 @@ public class Supermarket extends SimState {
 			for (int i = 0; i < GRID_WIDTH; i++) {
 				if (customerGrid.getObjectsAtLocation(i, CHECKOUT_POSITION_Y) != null) {
 					Customer customer = (Customer) customerGrid.getObjectsAtLocation(i, CHECKOUT_POSITION_Y).get(0);
+
+
+					if (schedule.getSteps() % 10 == 0) { // append every 10 seconds a new arff entry for WEKA
+						String name = customer.name;
+						long timestamp = schedule.getSteps();
+						int numberOfWatingCustomers = getNumberOfWaitingCustomers();
+						// TODO append the attributes divided by a comma
+
+						if (schedule.getSteps() % 10000 == 0) { // after 1000 entries we save the file
+							// TODO close your file
+						}
+
+					}
+
 					if (customer != customersAtCheckout[i]) {
 						schedule.scheduleOnceIn(customer.getCheckoutTime(), (Steppable) (SimState leaveState) -> {
 							customerGrid.remove(customer);
