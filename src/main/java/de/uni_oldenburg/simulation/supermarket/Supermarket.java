@@ -3,6 +3,7 @@ package de.uni_oldenburg.simulation.supermarket;
 import de.uni_oldenburg.simulation.supermarket.customers.Customer;
 import de.uni_oldenburg.simulation.supermarket.customers.OnlyGoForwardCustomer;
 import de.uni_oldenburg.simulation.supermarket.customers.RandomStrategyCustomer;
+import de.uni_oldenburg.simulation.supermarket.customers.ShortestQueueStrategyCustomer;
 import sim.engine.*;
 import sim.field.grid.*;
 
@@ -75,7 +76,7 @@ public class Supermarket extends SimState {
 						case 2: newCustomers[i] = new RandomStrategyCustomer(this);
 							break;
 
-						case 3: newCustomers[i] = new RandomStrategyCustomer(this);
+						case 3: newCustomers[i] = new ShortestQueueStrategyCustomer(this);
 							break;
 					}
 				}
@@ -117,6 +118,42 @@ public class Supermarket extends SimState {
 	 */
 	private boolean newCustomerArrived() {
 		return (checkoutCustomersAmount_mean*GRID_WIDTH - checkoutCustomersAmount_variance)  > random.nextGaussian() * checkoutCustomersAmount_variance + getNumberOfWaitingCustomers();
+	}
+
+	/**
+	 * @return The number of customers in the supermarket
+	 */
+	public int getNumberOfWaitingCustomers() {
+		int waitingCustomers = 0;
+		for (int x = 0; x < GRID_WIDTH; x++) {
+			for (int y = 0; y < GRID_HEIGHT; y++) {
+				try {
+					if (customerGrid.getObjectsAtLocation(x, y) != null) waitingCustomers++;
+				} catch (NullPointerException e) {}
+			}
+		}
+		return waitingCustomers;
+	}
+
+	/**
+	 * @return The number of customers in the supermarket
+	 */
+	public int getShortestQueue() {
+		int shortestQueue = -1;
+		int shortestQueueWaitingCustomers = 0;
+		for (int queue = 0; queue < GRID_WIDTH; queue++) {
+			int waitingQueueCustomers = 0;
+			for (int y = 0; y < GRID_HEIGHT; y++) {
+				try {
+					if (customerGrid.getObjectsAtLocation(queue, y) != null) waitingQueueCustomers++;
+				} catch (NullPointerException e) {}
+			}
+			if (waitingQueueCustomers < shortestQueueWaitingCustomers || shortestQueue == -1) {
+				shortestQueue = queue;
+				shortestQueueWaitingCustomers = waitingQueueCustomers;
+			}
+		}
+		return shortestQueue;
 	}
 
 	/**
@@ -247,21 +284,6 @@ public class Supermarket extends SimState {
 	 */
 	public void setCheckoutProcessingTime_mean(double checkoutProcessingTime_mean) {
 		this.checkoutProcessingTime_mean = checkoutProcessingTime_mean;
-	}
-
-	/**
-	 * @return The number of customers in the supermarket
-	 */
-	public int getNumberOfWaitingCustomers() {
-		int waitingCustomers = 0;
-		for (int x = 0; x < GRID_WIDTH; x++) {
-			for (int y = 0; y < GRID_HEIGHT; y++) {
-				try {
-					if (customerGrid != null & customerGrid.getObjectsAtLocation(x, y) != null) waitingCustomers++;
-				} catch (NullPointerException e) {}
-			}
-		}
-		return waitingCustomers;
 	}
 
 	/**

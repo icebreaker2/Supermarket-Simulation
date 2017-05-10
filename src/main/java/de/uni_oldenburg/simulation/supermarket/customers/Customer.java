@@ -40,6 +40,9 @@ public abstract class Customer extends OvalPortrayal2D implements Steppable, Dis
 		// Update location
 		location = supermarket.customerGrid.getObjectLocation(this);
 
+		// Update shortest queue
+
+
 		// Customer still in the supermarket?
 		if (location != null) {
 
