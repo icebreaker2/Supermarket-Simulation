@@ -6,7 +6,7 @@
 
     <groupId>de.uni_oldenburg.simulation</groupId>
     <artifactId>supermarket</artifactId>
-    <version>1.0</version>
+    <version>2.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -19,61 +19,40 @@
     </properties>
 
     <dependencies>
+        <!-- jUnit testing -->
         <dependency>
-            <groupId>org.beanshell</groupId>
-            <artifactId>bsh</artifactId>
-            <version>2.0b4</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>RELEASE</version>
+        </dependency>
+
+        <!-- MASON -->
         <dependency>
             <groupId>fr.irit.smac.thirdparty.edu.gmu.cs</groupId>
             <artifactId>mason</artifactId>
             <version>18</version>
         </dependency>
 
+        <!-- WEKA -->
         <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>itextpdf</artifactId>
-            <version>5.5.11</version>
+            <groupId>nz.ac.waikato.cms.weka</groupId>
+            <artifactId>weka-stable</artifactId>
+            <version>3.8.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.scijava</groupId>
-            <artifactId>j3dcore</artifactId>
-            <version>1.6.0-scijava-2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scijava</groupId>
-            <artifactId>j3dutils</artifactId>
-            <version>1.6.0-scijava-2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jfree</groupId>
-            <artifactId>jcommon</artifactId>
-            <version>1.0.24</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jfree</groupId>
-            <artifactId>jfreechart</artifactId>
-            <version>1.0.19</version>
-        </dependency>
-        <dependency>
-            <groupId>jmf</groupId>
-            <artifactId>jmf</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/libs/jmf.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>portfolio</groupId>
-            <artifactId>portfolio</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/libs/portfolio.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>javax.vecmath</groupId>
-            <artifactId>vecmath</artifactId>
-            <version>1.5.2</version>
-        </dependency>
+
+
     </dependencies>
 
     <build>
@@ -92,8 +71,9 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+
+            <!-- Build an executable JAR -->
             <plugin>
-                <!-- Build an executable JAR -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.0.2</version>
@@ -101,9 +81,28 @@
                     <archive>
                         <index>true</index>
                         <manifest>
-                            <mainClass>de.uni_oldenburg.simulation.supermarket.SupermarketWithUI</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>de.uni_oldenburg.simulation.supermarket.AppStarter</mainClass>
                         </manifest>
                     </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                    <shadedClassifierName>with-dependencies</shadedClassifierName>
                 </configuration>
             </plugin>
         </plugins>
