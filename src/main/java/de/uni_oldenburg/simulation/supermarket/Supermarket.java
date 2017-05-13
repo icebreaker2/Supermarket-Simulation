@@ -10,6 +10,7 @@ import sim.field.grid.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * This is our simulation model for a supermarket.
@@ -42,9 +43,6 @@ public class Supermarket extends SimState {
 	public static final int GRID_HEIGHT = 50;
 	public static final int GRID_WIDTH = 4;
 
-	StringBuilder sb;
-	PrintWriter pw;
-
 	Customer[] customersAtCheckout = new Customer[GRID_WIDTH]; // Just a reference
 
 	public Supermarket(long seed) {
@@ -58,7 +56,7 @@ public class Supermarket extends SimState {
 		super.start();  // clear out the schedule
 
 		//Initialize arff export
-		this.sb = initializeCsv();
+		ARFFWriter.initializeARFF();
 
 		// Initialize grids
 		customerGrid = new SparseGrid2D(GRID_WIDTH, GRID_HEIGHT);
@@ -110,36 +108,10 @@ public class Supermarket extends SimState {
 				if (customerGrid.getObjectsAtLocation(i, CHECKOUT_POSITION_Y) != null) {
 					Customer customer = (Customer) customerGrid.getObjectsAtLocation(i, CHECKOUT_POSITION_Y).get(0);
 
-
 					if (schedule.getSteps() % 10 == 0) { // append a new entry every 10 seconds
 						long timestamp = schedule.getSteps();
 						int numberOfWaitingCustomers = getNumberOfWaitingCustomers();
-						sb.append(numberOfWaitingCustomers).append(",").append(customerStrategy).append(",").append(timestamp);
-						sb.append('\n');
-
-						if (schedule.getSteps() % 10000 == 0) { // save to a new file every 10000 seconds
-
-							File file = new File(System.getProperty("user.dir") + File.separator + "arffOutput" + File.separator + "output.arff");
-							boolean fileCreated = (new File(System.getProperty("user.dir") + File.separator + "arffOutput")).mkdirs();
-							if (fileCreated || file.exists()) {
-								int increase = 1;
-								while (file.exists()) {
-									increase++;
-									file = new File(System.getProperty("user.dir") + File.separator + "arffOutput" + File.separator + "output_" + increase + ".arff");
-								}
-								try {
-									pw = new PrintWriter(file);
-								} catch (FileNotFoundException e) {
-									e.printStackTrace();
-								}
-								if (pw != null) {
-									pw.write(sb.toString());
-									pw.close();
-									System.out.println("Data exported successfully to " + file.getAbsolutePath() + "!");
-								}
-							}
-						}
-
+						ARFFWriter.appendArffEntry(numberOfWaitingCustomers, customerStrategy, timestamp);
 					}
 
 					if (customer != customersAtCheckout[i]) {
@@ -149,6 +121,10 @@ public class Supermarket extends SimState {
 						customersAtCheckout[i] = customer;
 					}
 				}
+			}
+
+			if (schedule.getSteps() != 0 && schedule.getSteps() % 10000 == 0) { // save to a new file every 10000 seconds
+				ARFFWriter.writeToARFF();
 			}
 		}, 1);
 	}
@@ -334,27 +310,6 @@ public class Supermarket extends SimState {
 	 */
 	public int getTotalCustomersAmount() {
 		return totalCustomersAmount;
-	}
-
-	public StringBuilder initializeCsv() {
-	    StringBuilder sb = new StringBuilder();
-	sb.append("@RELATION waitingCustomers");
-		sb.append('\n');
-		sb.append("@ATTRIBUTE waitingCustomersAtCheckouts NUMERIC");
-		sb.append('\n');
-		sb.append("@ATTRIBUTE strategy STRING");
-		sb.append('\n');
-		sb.append("@ATTRIBUTE timestamp NUMERIC");
-		sb.append('\n');
-		sb.append("@Data");
-		sb.append('\n');
-
-		return sb;
-/*		if (pw != null) {
-			pw.write(sb.toString());
-			pw.close();
-			System.out.println("done!");
-		}*/
 	}
 
 }
