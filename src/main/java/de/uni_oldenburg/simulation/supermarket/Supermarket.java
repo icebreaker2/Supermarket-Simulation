@@ -7,6 +7,11 @@ import de.uni_oldenburg.simulation.supermarket.customers.ShortestQueueStrategyCu
 import sim.engine.*;
 import sim.field.grid.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  * This is our simulation model for a supermarket.
  */
@@ -50,7 +55,8 @@ public class Supermarket extends SimState {
 	public void start() {
 		super.start();  // clear out the schedule
 
-		// TODO add your arff writer (initilize) here
+		//Initialize arff export
+		ARFFWriter.initializeARFF();
 
 		// Initialize grids
 		customerGrid = new SparseGrid2D(GRID_WIDTH, GRID_HEIGHT);
@@ -102,17 +108,10 @@ public class Supermarket extends SimState {
 				if (customerGrid.getObjectsAtLocation(i, CHECKOUT_POSITION_Y) != null) {
 					Customer customer = (Customer) customerGrid.getObjectsAtLocation(i, CHECKOUT_POSITION_Y).get(0);
 
-
-					if (schedule.getSteps() % 10 == 0) { // append every 10 seconds a new arff entry for WEKA
-						String name = customer.name;
+					if (schedule.getSteps() % 10 == 0) { // append a new entry every 10 seconds
 						long timestamp = schedule.getSteps();
-						int numberOfWatingCustomers = getNumberOfWaitingCustomers();
-						// TODO append the attributes divided by a comma
-
-						if (schedule.getSteps() % 10000 == 0) { // after 1000 entries we save the file
-							// TODO close your file
-						}
-
+						int numberOfWaitingCustomers = getNumberOfWaitingCustomers();
+						ARFFWriter.appendArffEntry(numberOfWaitingCustomers, customerStrategy, timestamp);
 					}
 
 					if (customer != customersAtCheckout[i]) {
@@ -122,6 +121,10 @@ public class Supermarket extends SimState {
 						customersAtCheckout[i] = customer;
 					}
 				}
+			}
+
+			if (schedule.getSteps() != 0 && schedule.getSteps() % 10000 == 0) { // save to a new file every 10000 seconds
+				ARFFWriter.writeToARFF();
 			}
 		}, 1);
 	}
@@ -308,4 +311,5 @@ public class Supermarket extends SimState {
 	public int getTotalCustomersAmount() {
 		return totalCustomersAmount;
 	}
+
 }
